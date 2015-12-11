@@ -79,25 +79,27 @@
       <Entity type="Class">
         <Name>Message</Name>
         <Access>Public</Access>
-        <Location left="795" top="462" />
+        <Location left="1230" top="160" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int timestamp</Member>
         <Member type="Field">private int userid</Member>
-        <Member type="Field">private String message</Member>
+        <Member type="Field">private String content</Member>
+        <Member type="Field">private int senderID</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
-        <Name>ChatRoom</Name>
+        <Name>Conversation</Name>
         <Access>Public</Access>
-        <Location left="957" top="160" />
+        <Location left="873" top="160" />
         <Size width="192" height="216" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">private String name</Member>
+        <Member type="Field">public String name</Member>
+        <Member type="Field">public Collection&lt;Message&gt; messages</Member>
         <Member type="Method">public void eventMessageRecived()</Member>
         <Member type="Method">public void eventMessageSend()</Member>
         <Member type="Method">public void listUsers()</Member>
-        <Member type="Method">public void printMesssage()</Member>
+        <Member type="Method">public void printMesssages()</Member>
         <Member type="Method">public void eventUserJoin()</Member>
         <Member type="Method">public void eventUserLeave()</Member>
         <Modifier>None</Modifier>
@@ -105,18 +107,18 @@
       <Entity type="Class">
         <Name>User</Name>
         <Access>Public</Access>
-        <Location left="568" top="160" />
+        <Location left="567" top="160" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">private int userid</Member>
         <Member type="Field">private String nickname</Member>
+        <Member type="Field">private int userID</Member>
         <Member type="Method">public void generateUniqId()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Interface">
         <Name>Network</Name>
         <Access>Public</Access>
-        <Location left="1038" top="462" />
+        <Location left="258" top="476" />
         <Size width="224" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">static final ArrayList peerList</Member>
@@ -129,7 +131,7 @@
       <Entity type="Class">
         <Name>AdminUser</Name>
         <Access>Public</Access>
-        <Location left="287" top="451" />
+        <Location left="288" top="160" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int userid</Member>
@@ -139,42 +141,60 @@
         <Member type="Method">public void muteUser()</Member>
         <Modifier>None</Modifier>
       </Entity>
+      <Entity type="Class">
+        <Name>Client</Name>
+        <Access>Public</Access>
+        <Location left="689" top="496" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public void sendMessage()</Member>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Client4</Name>
+        <Access>Public</Access>
+        <Location left="773" top="780" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Client6</Name>
+        <Access>Public</Access>
+        <Location left="601" top="780" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Server6</Name>
+        <Access>Public</Access>
+        <Location left="990" top="780" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Server4</Name>
+        <Access>Public</Access>
+        <Location left="1160" top="780" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Server</Name>
+        <Access>Public</Access>
+        <Location left="1073" top="496" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">public char ipAddress</Member>
+        <Member type="Field">public int port</Member>
+        <Member type="Method">public void reciveMessage()</Member>
+        <Modifier>Abstract</Modifier>
+      </Entity>
     </Entities>
     <Relationships>
-      <Relationship type="Association" first="0" second="2">
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-        <BendPoint relativeToStartShape="False">
-          <X>639</X>
-          <Y>432</Y>
-        </BendPoint>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Aggregation</AssociationType>
-      </Relationship>
-      <Relationship type="Association" first="3" second="1">
-        <Label>
-        </Label>
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-      </Relationship>
-      <Relationship type="Association" first="1" second="0">
-        <Label>
-        </Label>
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-      </Relationship>
-      <Relationship type="Association" first="1" second="3">
-        <Label>
-        </Label>
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
-      </Relationship>
       <Relationship type="Association" first="2" second="1">
         <Label>Joins</Label>
         <StartOrientation>Horizontal</StartOrientation>
@@ -188,13 +208,35 @@
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>476</X>
-          <Y>568</Y>
-        </BendPoint>
-        <BendPoint relativeToStartShape="False">
-          <X>541</X>
+          <X>477</X>
           <Y>277</Y>
         </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>540</X>
+          <Y>277</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Generalization" first="6" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Generalization" first="7" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Generalization" first="8" second="10">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Generalization" first="9" second="10">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="0" second="1">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
       </Relationship>
     </Relationships>
   </ProjectItem>
