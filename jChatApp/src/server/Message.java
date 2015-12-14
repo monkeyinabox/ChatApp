@@ -34,7 +34,7 @@ public class Message implements Serializable {
 	private long timestamp;
 	
 	// Constructor
-	private Message(int i, String c, String cid, String sid){
+	public Message(int i, String c, String cid, String sid){
 		messageType = i;
 		content = c;
 		timestamp = Instant.now().getEpochSecond();
@@ -49,7 +49,12 @@ public class Message implements Serializable {
 	public String getContent() {
 		return content;
 	}
+	
 	public String getConversationID() {
 		return conversationID;
+	}
+	
+	public String getSenderID() {
+		return senderID;
 	}
 }
