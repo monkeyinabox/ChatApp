@@ -193,6 +193,14 @@
         <Member type="Method">public void reciveMessage()</Member>
         <Modifier>Abstract</Modifier>
       </Entity>
+      <Entity type="Class">
+        <Name>Parser</Name>
+        <Access>Public</Access>
+        <Location left="96" top="160" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
     </Entities>
     <Relationships>
       <Relationship type="Association" first="2" second="1">
