@@ -4,13 +4,14 @@ package client;
 import java.io.*;
 import java.net.*;
 
-public final class Client {
+import server.*;
 
+public final class Client {
 	static final int PORT=1337;
 	
 	private Client() {}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		// Get the servers IP Address
 		InetAddress addr = InetAddress.getByName("localhost");
@@ -18,35 +19,34 @@ public final class Client {
 
 		// Get the servers port number
 		Socket socket = new Socket(addr, PORT);
-
+		
 		// Keep everything in a try-finally to make sure that the socket is closed
 		try {
 			System.out.println("socket = " + socket);
-			System.out.println("READY to work ");
 
-			// Prepare the in stream
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			// Output is automatically flushed by PrintWriter
-			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
-			// Keyboard Input
 			BufferedReader KeyboardIn = new BufferedReader(new InputStreamReader(System.in));
-
+			System.out.println("Got the keyboard..");
+			
+		
+			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+			System.out.println("Got the OutputStream..");
+			
+			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+			System.out.println("Got the InputStream..");
+			
 			while (true) {
 				// What to say to server?
+				
+				output.writeObject(new Message(2,"Hans", "system", "hans"));
+				output.writeObject(new Message(3,"Hans", "system", "hans"));
+				
 				System.out.print("What to say to server: ");
 				String what = KeyboardIn.readLine();
+				output.writeObject(new Message(1, what, "default", "hans"));
+				output.flush();
 
-				// Say it
-				out.println(what);
-
-				// Get the echo
-				String str = in.readLine();
-				System.out.println("From server: " + str);
-				System.out.println("Enter END to stop");
-
-				if (what.equals("END")) break; // The server is waiting for "END"
+            	Message ms = (Message) input.readObject();
+            	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
 			}
 
 		}

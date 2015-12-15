@@ -79,40 +79,50 @@
       <Entity type="Class">
         <Name>Message</Name>
         <Access>Public</Access>
-        <Location left="1230" top="160" />
+        <Location left="1301" top="476" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int timestamp</Member>
         <Member type="Field">private int userid</Member>
         <Member type="Field">private String content</Member>
-        <Member type="Field">private int senderID</Member>
+        <Member type="Field">private String conversationID</Member>
+        <Member type="Method">public void getConversationID()</Member>
+        <Member type="Method">public void getContent()</Member>
+        <Member type="Method">public void getSenderID()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>Conversation</Name>
         <Access>Public</Access>
-        <Location left="873" top="160" />
-        <Size width="192" height="216" />
+        <Location left="842" top="160" />
+        <Size width="192" height="247" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">public String name</Member>
-        <Member type="Field">public Collection&lt;Message&gt; messages</Member>
-        <Member type="Method">public void eventMessageRecived()</Member>
-        <Member type="Method">public void eventMessageSend()</Member>
-        <Member type="Method">public void listUsers()</Member>
-        <Member type="Method">public void printMesssages()</Member>
-        <Member type="Method">public void eventUserJoin()</Member>
-        <Member type="Method">public void eventUserLeave()</Member>
+        <Member type="Field">private String conversationName</Member>
+        <Member type="Field">private ArrayList&lt;User&gt; users</Member>
+        <Member type="Field">private Collection&lt;Message&gt; messages</Member>
+        <Member type="Method">public void getConversationName()</Member>
+        <Member type="Method">public void getConversationID()</Member>
+        <Member type="Method">public void getUsers()</Member>
+        <Member type="Method">public void addMessage(Message message)</Member>
+        <Member type="Method">public void userJoin(User user)</Member>
+        <Member type="Method">public void userLeave(User user)</Member>
+        <Member type="Constructor">public Conversation(String s)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>User</Name>
         <Access>Public</Access>
-        <Location left="567" top="160" />
+        <Location left="568" top="160" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private String nickname</Member>
         <Member type="Field">private int userID</Member>
-        <Member type="Method">public void generateUniqId()</Member>
+        <Member type="Field">private boolean userIsAdmin</Member>
+        <Member type="Field">private boolean userIsMuted</Member>
+        <Member type="Method">public String getUsername()</Member>
+        <Member type="Method">public int getUserID()</Member>
+        <Member type="Method">public boolean isUserIsAdmin()</Member>
+        <Member type="Method">public boolean isUserIsMuted()</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Interface">
@@ -131,7 +141,7 @@
       <Entity type="Class">
         <Name>AdminUser</Name>
         <Access>Public</Access>
-        <Location left="288" top="160" />
+        <Location left="10" top="10" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private int userid</Member>
@@ -144,7 +154,7 @@
       <Entity type="Class">
         <Name>Client</Name>
         <Access>Public</Access>
-        <Location left="689" top="496" />
+        <Location left="204" top="918" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Member type="Method">public void sendMessage()</Member>
@@ -153,7 +163,7 @@
       <Entity type="Class">
         <Name>Client4</Name>
         <Access>Public</Access>
-        <Location left="773" top="780" />
+        <Location left="688" top="1033" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Modifier>None</Modifier>
@@ -161,45 +171,67 @@
       <Entity type="Class">
         <Name>Client6</Name>
         <Access>Public</Access>
-        <Location left="601" top="780" />
+        <Location left="490" top="1033" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
-        <Name>Server6</Name>
+        <Name>MessageHandler</Name>
         <Access>Public</Access>
-        <Location left="990" top="780" />
-        <Size width="162" height="216" />
+        <Location left="831" top="476" />
+        <Size width="251" height="216" />
         <Collapsed>False</Collapsed>
+        <Member type="Method">public void run()</Member>
+        <Member type="Method">private void disconnect(Message message)</Member>
+        <Member type="Constructor">public MessageHandler()</Member>
+        <Member type="Method">private void userRemove(Message message)</Member>
+        <Member type="Method">private void userAdd(Message message)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
-        <Name>Server4</Name>
+        <Name>ClientHandler</Name>
         <Access>Public</Access>
-        <Location left="1160" top="780" />
+        <Location left="1110" top="476" />
         <Size width="162" height="216" />
         <Collapsed>False</Collapsed>
+        <Member type="Field">private Socket socket</Member>
+        <Member type="Field">private ObjectOutputStream out</Member>
+        <Member type="Field">private ObjectInputStream in</Member>
+        <Member type="Method">public void run()</Member>
+        <Member type="Constructor">public ClientHandler(Socket s)</Member>
         <Modifier>None</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>Server</Name>
         <Access>Public</Access>
-        <Location left="1073" top="496" />
-        <Size width="162" height="216" />
+        <Location left="591" top="476" />
+        <Size width="206" height="216" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">public char ipAddress</Member>
-        <Member type="Field">public int port</Member>
-        <Member type="Method">public void reciveMessage()</Member>
+        <Member type="Field">public static ArrayList clientOutputStreams</Member>
+        <Member type="Field">public static Queue messageQueue</Member>
+        <Member type="Field">public static int PORT = 1337</Member>
+        <Member type="Field">static final int LOG</Member>
+        <Member type="Method">public void ipAddress()</Member>
         <Modifier>Abstract</Modifier>
       </Entity>
       <Entity type="Class">
         <Name>Parser</Name>
         <Access>Public</Access>
-        <Location left="96" top="160" />
-        <Size width="162" height="216" />
+        <Location left="1297" top="160" />
+        <Size width="162" height="247" />
         <Collapsed>False</Collapsed>
         <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Client</Name>
+        <Access>Public</Access>
+        <Location left="1095" top="160" />
+        <Size width="162" height="247" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">public Queue messageQueue</Member>
+        <Member type="Method">public void sendMessage()</Member>
+        <Modifier>Abstract</Modifier>
       </Entity>
     </Entities>
     <Relationships>
@@ -212,18 +244,6 @@
         <StartMultiplicity>1..*</StartMultiplicity>
         <EndMultiplicity>1</EndMultiplicity>
       </Relationship>
-      <Relationship type="Generalization" first="4" second="2">
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <BendPoint relativeToStartShape="True">
-          <X>477</X>
-          <Y>277</Y>
-        </BendPoint>
-        <BendPoint relativeToStartShape="False">
-          <X>540</X>
-          <Y>277</Y>
-        </BendPoint>
-      </Relationship>
       <Relationship type="Generalization" first="6" second="5">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
@@ -231,20 +251,6 @@
       <Relationship type="Generalization" first="7" second="5">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
-      </Relationship>
-      <Relationship type="Generalization" first="8" second="10">
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-      </Relationship>
-      <Relationship type="Generalization" first="9" second="10">
-        <StartOrientation>Vertical</StartOrientation>
-        <EndOrientation>Vertical</EndOrientation>
-      </Relationship>
-      <Relationship type="Association" first="0" second="1">
-        <StartOrientation>Horizontal</StartOrientation>
-        <EndOrientation>Horizontal</EndOrientation>
-        <Direction>Unidirectional</Direction>
-        <AssociationType>Association</AssociationType>
       </Relationship>
     </Relationships>
   </ProjectItem>

@@ -2,40 +2,50 @@ package server;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
 	private Socket socket;
-	private BufferedReader in;
-	private PrintWriter out;
-
+	private ObjectOutputStream out;
+	
 	public ClientHandler(Socket s) throws IOException {
-		
 		socket = s;
-		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-		Server.LOG.info("in and out initialized");
 	}
 	
 	@Override
-	public void run(){		
-		try{while (true) {
-			// Get messages
-			String str = in.readLine();
-			if (str.equals("END")) break;
-
-			// modify string
-			str = str + str;
-			System.out.println("Echoing: " + str); // On the screen
-			out.println(str); // To the client
+	public void run(){
+		Server.LOG.info("ClientHandler thread started succsefully");
+		try{
+			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+			Server.LOG.info("InputStream created");
+			
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			Server.LOG.info("OutputStream created");
+			
+			Server.clientOutputStreams.add(out);
+			Server.LOG.info("New Outputstream added to collection of Outputstreams");
+			
+			while (true) {
+	        	/** Read messages from Socket and save to messageQueue */
+				Message ms = (Message) in.readObject();
+	        	Server.LOG.info("Action: Reciving Message, MessageID: "+ms.getMessageID()+", MessageType: "+ms.getMessageType()+", recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
+	        	Server.messageQueue.add(ms);
+	        	Server.LOG.info("Action: Added to Queue, MessageID: "+ ms.getMessageID());
+			}
 		}
-		System.out.println("closing...");
-	}
-	catch (IOException e) {}
+		catch(Exception m){	Server.LOG.warning("Error on reading input stream at " + this.socket + " with exectipn: " + m);}
+	
 	finally {
-		try {socket.close();}
-		catch (IOException e) {}
+		
+		try {
+			socket.close();
+			Server.LOG.info("Closing client socket");
+			Server.clientOutputStreams.remove(out);
+			Server.LOG.info("Outputstream removed");
+		}
+		catch (IOException e) {Server.LOG.warning("Error on closing socket: " + this.socket);}
+		}
 	}
-  }	
 }
+
+
