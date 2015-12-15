@@ -4,7 +4,7 @@ package client;
 import java.io.*;
 import java.net.*;
 
-import server.Server;
+import server.*;
 
 public final class Client {
 	static final int PORT=1337;
@@ -19,33 +19,29 @@ public final class Client {
 
 		// Get the servers port number
 		Socket socket = new Socket(addr, PORT);
-
+		
 		// Keep everything in a try-finally to make sure that the socket is closed
 		try {
 			System.out.println("socket = " + socket);
-			System.out.println("READY to work ");
 
-			// Prepare the in stream
-			// BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			// Output is automatically flushed by PrintWriter
-			// PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-
-			// Keyboard Input
 			BufferedReader KeyboardIn = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Got the keyboard..");
 			
-			OutputStream out = socket.getOutputStream();
-			ObjectOutputStream oOut = new ObjectOutputStream(out);
+		
+			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+			System.out.println("Got the OutputStream..");
+			
+			ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+			System.out.println("Got the InputStream..");
 			
 			while (true) {
 				// What to say to server?
 				System.out.print("What to say to server: ");
 				String what = KeyboardIn.readLine();
-				oOut.writeObject(new server.Message(1, what, "default", "hans"));
-				oOut.flush();
+				output.writeObject(new Message(1, what, "default", "hans"));
+				output.flush();
 
-            	ObjectInputStream oIn = new ObjectInputStream(socket.getInputStream());
-            	server.Message ms = (server.Message) oIn.readObject();
+            	Message ms = (Message) input.readObject();
             	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
 			}
 

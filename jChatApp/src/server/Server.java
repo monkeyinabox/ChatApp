@@ -2,11 +2,10 @@ package server;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 
 public class Server{
@@ -40,14 +39,9 @@ public class Server{
 		try{
 			while (true){
 			Socket socket = s.accept();
-			Thread t = new Thread(new ClientHandler(socket));
-			
-			//TEST
-			InetAddress ipAddress = s.getInetAddress();
-			//cip.add(ipAddress);
-			
-			t.start();
 			LOG.info("Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
+			Thread t = new Thread(new ClientHandler(socket));
+			t.start();
 			}
 		}
 		catch (IOException e){
