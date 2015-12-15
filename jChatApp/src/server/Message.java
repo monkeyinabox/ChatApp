@@ -24,6 +24,7 @@ public class Message implements Serializable {
 	private String conversationID;
 	private String senderID;
 	private String content;
+	private int messageID;
 	private long timestamp;
 	
 	// Constructor
@@ -33,6 +34,7 @@ public class Message implements Serializable {
 		timestamp = Instant.now().getEpochSecond();
 		conversationID = cid;
 		senderID = sid;
+		messageID = this.hashCode();
 	}
 	
 	public int getMessageType() {
@@ -49,5 +51,9 @@ public class Message implements Serializable {
 	
 	public String getSenderID() {
 		return senderID;
+	}
+	
+	public int getMessageID() {
+		return messageID;
 	}
 }

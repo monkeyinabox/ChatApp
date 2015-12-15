@@ -3,7 +3,6 @@ package server;
 import java.io.*;
 import java.net.*;
 
-
 public class ClientHandler implements Runnable {
 
 	private Socket socket;
@@ -19,16 +18,19 @@ public class ClientHandler implements Runnable {
 		try{
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			Server.LOG.info("InputStream created");
+			
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			Server.LOG.info("OutputStream created");
+			
 			Server.clientOutputStreams.add(out);
 			Server.LOG.info("New Outputstream added to collection of Outputstreams");
 			
 			while (true) {
-	        	Message ms = (Message) in.readObject();
-	        	Server.LOG.info("Message <"+ ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
+	        	/** Read messages from Socket and save to messageQueue */
+				Message ms = (Message) in.readObject();
+	        	Server.LOG.info("Action: Reciving Message, MessageID: "+ms.getMessageID()+", MessageType: "+ms.getMessageType()+", recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
 	        	Server.messageQueue.add(ms);
-	        	Server.LOG.info("Message Added to Queue");
+	        	Server.LOG.info("Action: Added to Queue, MessageID: "+ ms.getMessageID());
 			}
 		}
 		catch(Exception m){	Server.LOG.warning("Error on reading input stream at " + this.socket + " with exectipn: " + m);}

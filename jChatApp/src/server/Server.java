@@ -12,8 +12,8 @@ public class Server{
 	
 	//Collection of all connected clientsOutputStreams
 	public static ArrayList clientOutputStreams = new ArrayList();
-	ArrayList conversations;
-	ArrayList<String> users;
+	ArrayList<Conversation> conversations;
+	ArrayList<User> users;
 	//MessageQueue that caches incoming messages
 	public static Queue<Message> messageQueue = new LinkedList<Message>();
 	
@@ -33,8 +33,16 @@ public class Server{
 		System.out.println("--------------------");
 		ipAddress();
 	
-		Thread mt = new Thread(new MessageHandler());
-		mt.start();
+		/** Start MessageHandler Thread, change number of threads if needed  */
+		
+		for (int i = 1; i < 2; i++) {
+			LOG.info("Starting MessagaeHandler thread #: "+i);
+			try{
+				Thread mh = new Thread(new MessageHandler());
+				mh.start();
+			}
+			catch (Exception ex){LOG.info("Error in MessageHandler"+ ex);}
+		}
 		
 		try{
 			while (true){
@@ -48,10 +56,11 @@ public class Server{
 			LOG.warning("Got an IO Exception while starting ClientThread.. closing client socket..(or not)");
 			// socket.close();
 		}
-	finally {
-		s.close();
-		LOG.info("Server is Stopping...");
-	}
+	
+		finally {
+			s.close();
+			LOG.info("Server is Stopping...");
+		}
 	
 	}
 	

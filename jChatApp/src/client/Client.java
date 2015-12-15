@@ -36,6 +36,10 @@ public final class Client {
 			
 			while (true) {
 				// What to say to server?
+				
+				output.writeObject(new Message(2,"Hans", "system", "hans"));
+				output.writeObject(new Message(3,"Hans", "system", "hans"));
+				
 				System.out.print("What to say to server: ");
 				String what = KeyboardIn.readLine();
 				output.writeObject(new Message(1, what, "default", "hans"));
