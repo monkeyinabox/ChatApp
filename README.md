@@ -1,1 +1,1 @@
-"""CHAT APP"""
+Multiclient Chat Application written in Java
