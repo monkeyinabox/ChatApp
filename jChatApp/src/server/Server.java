@@ -1,17 +1,31 @@
 package server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//Importing Classes from client packages
+import client.Conversation;
 
+
+/**
+ * 
+ * @author rifl
+ * This Class is starting two thread
+ * 		- ClientHandler is dealing with client connections and will receive incoming messages and save them in messageQueue
+ * 		- MessageHandler will process messages in messageQueue and will parse and forward messages
+ */
 
 public class Server{
 	
+	
+
+
 	//Collection of all connected clientsOutputStreams
-	public static ArrayList clientOutputStreams = new ArrayList();
+	public static ArrayList<ObjectOutputStream> clientOutputStreams = new ArrayList<ObjectOutputStream>();
 	ArrayList<Conversation> conversations;
 	ArrayList<User> users;
 	//MessageQueue that caches incoming messages
@@ -20,41 +34,41 @@ public class Server{
 	
 	// Network Port 	
 	static final int PORT=1337;
-	//Logger
+	// Logger initialization
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	public static void jChatAppServer() throws IOException{
-		// ArrayList cip = new ArrayList();
+
 		LOG.setLevel(Level.INFO);	
 		ServerSocket s = new ServerSocket(PORT);
-		LOG.info("Server Socket is up an running, start serving clients");
-	
+		LOG.info("Info: Server Socket is up an running, start serving clients");
 		System.out.println("JChatApp Server v0.1");
 		System.out.println("--------------------");
 		ipAddress();
 	
-		/** Start MessageHandler Thread, change number of threads if needed  */
-		
-		for (int i = 1; i < 2; i++) {
-			LOG.info("Starting MessagaeHandler thread #: "+i);
-			try{
-				Thread mh = new Thread(new MessageHandler());
-				mh.start();
-			}
-			catch (Exception ex){LOG.info("Error in MessageHandler"+ ex);}
+	
+		LOG.info("Info: Starting MessagaeHandler thread");
+		try{
+			Thread mh = new Thread(new MessageHandler());
+			mh.start();
 		}
+		catch (Exception ex){LOG.info("Error : starting MessageHandler failed with exeption: "+ ex);}
+		
+		// Statistics
+	
 		
 		try{
 			while (true){
 			Socket socket = s.accept();
-			LOG.info("Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
+			LOG.info("Info: Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
 			Thread t = new Thread(new ClientHandler(socket));
 			t.start();
+			
 			}
 		}
 		catch (IOException e){
-			LOG.warning("Got an IO Exception while starting ClientThread.. closing client socket..(or not)");
-			// socket.close();
+			LOG.warning("Error: Got an IO Exception while starting ClientThread.. closing socket..(or not)");
+			s.close();
 		}
 	
 		finally {
@@ -63,7 +77,10 @@ public class Server{
 		}
 	
 	}
-	
+	/**
+	 * ipAddress is providing console Output on server startup with Address Informations
+	 * Note ->> Multiple Interfaces are not handled by this script!
+	 */
 	public static void ipAddress() {
         InetAddress ip;
         String hostname;
@@ -75,7 +92,7 @@ public class Server{
     		System.out.println("Port Nr.: "+ PORT);
  
         } catch (UnknownHostException e) { 
-            e.printStackTrace();
+        	LOG.severe("Error: Could not determine servers IP address, shuting down... "+ e);
         }
     }
 }
