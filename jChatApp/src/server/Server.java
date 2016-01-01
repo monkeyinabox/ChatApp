@@ -20,17 +20,13 @@ import client.Conversation;
  */
 
 public class Server{
-	
-	
-
 
 	//Collection of all connected clientsOutputStreams
 	public static ArrayList<ObjectOutputStream> clientOutputStreams = new ArrayList<ObjectOutputStream>();
-	ArrayList<Conversation> conversations;
-	ArrayList<User> users;
+	// ArrayList<Conversation> conversations;
+	public static ArrayList<String> userlist = new ArrayList<String>();
 	//MessageQueue that caches incoming messages
 	public static Queue<Message> messageQueue = new LinkedList<Message>();
-	
 	
 	// Network Port 	
 	static final int PORT=1337;
@@ -46,7 +42,7 @@ public class Server{
 		System.out.println("--------------------");
 		ipAddress();
 	
-	
+	 /**
 		LOG.info("Info: Starting MessagaeHandler thread");
 		try{
 			Thread mh = new Thread(new MessageHandler());
@@ -55,7 +51,7 @@ public class Server{
 		catch (Exception ex){LOG.info("Error : starting MessageHandler failed with exeption: "+ ex);}
 		
 		// Statistics
-	
+	*/
 		
 		try{
 			while (true){
@@ -63,7 +59,6 @@ public class Server{
 			LOG.info("Info: Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
 			Thread t = new Thread(new ClientHandler(socket));
 			t.start();
-			
 			}
 		}
 		catch (IOException e){
