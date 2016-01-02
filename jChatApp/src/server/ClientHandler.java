@@ -2,17 +2,14 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ClientHandler implements Runnable {
 
 	private Socket socket;
-	private ObjectOutputStream out;
-	
-	// Get userID from Client to identify clientHandler <-> user relation
 	private int chID = this.hashCode();
-	private User user;
-	
+	private User user = new User("tmp");
 	
 	public ClientHandler(Socket s) throws IOException {
 		socket = s;
@@ -25,53 +22,59 @@ public class ClientHandler implements Runnable {
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			Server.LOG.info("ClientHandler <"+ chID  +">: InputStream created: "+ in.toString());
 			
-			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-			Server.LOG.info("ClientHandler <"+ chID  +">: OutputStream created: "+ out.toString());
+			// Save OutputStream to User Object
+			user.setOutputStream(new ObjectOutputStream(socket.getOutputStream()));
 			
-			Server.clientOutputStreams.add(out);
+			// Add User to default conversation
+			Server.conversations.get(0).userJoin(user);
 			
 			while (true) {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
-	        	Server.LOG.info("ClientHandler <"+ chID  +">: Action: Reciving Message, MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderID() + ", Conversation: " +message.getConversationID()+ ", Content: " + message.getContent());
+	        	Server.LOG.info("ClientHandler <"+ chID  +">: Action: Reciving Message, MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderID() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
 	        	//Server.messageQueue.add(message);
+				  
 	        	//Server.LOG.info("ClientHandler <"+ chID  +">: Action: Added to Queue, MessageID: "+ ms.getMessageID());
+	        
+	        	if (user.getUsername() != message.getSenderID()) {
+					user.setUsername(message.getSenderID());
+				}
 	        	
 	    		switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients
 				case 1: sendMessage(message);
-						Server.LOG.info("MessageHandler: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
+						Server.LOG.info("ClinetHandler<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
 						break;
 				// Message Type 2 User is joining (content is user name)
 				case 2: userAdd(message);
-						Server.LOG.info("MessageHandler: Action: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 3 User left (content is user name)
 				case 3: userRemove(message);
-						Server.LOG.info("MessageHandler: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect(message);
-						Server.LOG.info("MessageHandler: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("ClientHandler<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
-				default: Server.LOG.severe("MessageHandler: Error: Message with unknown Message Type recived");
+				default: Server.LOG.severe("ClientHandler<"+ chID  +">: Error: Message with unknown Message Type recived");
 						break;
 				}
-			
 			}
 		}
-		catch(Exception m){	Server.LOG.warning("ClientHandler <"+ chID  +">: Error on reading input stream at " + this.socket + " with exectipn: " + m);}
+		catch(Exception m){	Server.LOG.warning("ClientHandler <"+ chID  +">: Error processing Message from socket: " + this.socket + " with exectipn: " + m + "\n" );
+							m.printStackTrace();}
 	
 	finally {
 		
 		try {
+			Server.LOG.info("ClientHandler:<"+ chID  +">: User removed from default channel");
+			Server.conversations.get(0).userLeave(user);
+						
 			socket.close();
-			Server.LOG.info("Closing client socket");
-	
-			Server.clientOutputStreams.remove(out);
-			Server.LOG.info("Outputstream removed");
+			Server.LOG.info("ClientHandler<"+ chID  +">: Closing client socket, Thank you and please come again..");
 		}
-		catch (IOException e) {Server.LOG.warning("ClientHandler <"+ chID  +">: Error on closing socket: " + this.socket);}
+		catch (IOException e) {Server.LOG.warning("ClientHandler <"+ chID  +">: Error on closing socket: ");}
 		}
 	}
 	
@@ -111,17 +114,23 @@ public class ClientHandler implements Runnable {
 	 * 
 	 */
 	private void userAdd(Message message) {
-		// Update all Client with new Username
-		sendMessage(new Message(2,message.getContent(),"system","server"));
-		
 		// (Unicast) Send all existing users to newly joined user
 		Server.userlist.add(message.getContent());
-		Iterator<String> it = Server.userlist.iterator();
-	    while (it.hasNext()) {
-	    	try {
-				out.writeObject(new Message(2,it.toString(),"system","server"));
-			} catch (IOException e) {
-				Server.LOG.warning("MessageHandler: Error: Could not send message to " + it.toString() +" with exeption: "+ e);
+		
+		// Update all Client with new User name
+		sendMessage(new Message(2,message.getContent(),message.getConversationName(),"server"));
+		Server.LOG.info("Updating Userlist: Username:" + message.getContent()+" Conversation: "+message.getConversationName()+ " "+Server.conversations.contains(message.getConversationName()) );
+		if (Server.conversations.contains(message.getConversationName())){
+			int indexOf = Server.conversations.indexOf(message.getConversationName());
+			ArrayList<User> al = Server.conversations.get(indexOf).getUsers();
+			
+			Iterator<User> it = al.iterator();
+		    while (it.hasNext()) {
+		    	try {
+		    		Server.LOG.info("Sending Udpate: "+it.toString());
+					user.getOutputStream().writeObject(new Message(2,it.toString(),message.getConversationName(),"server"));}
+		    	catch (IOException e) {
+					Server.LOG.warning("ClientHandler: Error: Could not send User " + it.toString() +" with exeption: "+ e);}
 			}
 		}
 	}
@@ -133,16 +142,14 @@ public class ClientHandler implements Runnable {
 	 * 
 	 */
 	public void sendMessage(Message message){
-		Iterator<ObjectOutputStream> it = Server.clientOutputStreams.iterator();
+		Iterator<User> it = Server.users.iterator();
 			while (it.hasNext()) {
 		        try {
-					ObjectOutputStream outputStream = (ObjectOutputStream) it.next();
-		        	outputStream.writeObject(message);
-		        	outputStream.flush();
+					it.next().getOutputStream().writeObject(message);
 		        } 
 		        catch (Exception ex) {
-		        	Server.LOG.warning("MessageHandler: Error: Could not send message to " + it.toString() +" with exeption: "+ ex);
-		        }
-			}
+		        	Server.LOG.warning("ClientHandler: Error: Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
+		    }
+		}
 	}
 }

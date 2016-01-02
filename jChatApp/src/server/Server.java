@@ -7,10 +7,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//Importing Classes from client packages
-import client.Conversation;
-
-
 /**
  * 
  * @author rifl
@@ -23,8 +19,13 @@ public class Server{
 
 	//Collection of all connected clientsOutputStreams
 	public static ArrayList<ObjectOutputStream> clientOutputStreams = new ArrayList<ObjectOutputStream>();
-	// ArrayList<Conversation> conversations;
+	
 	public static ArrayList<String> userlist = new ArrayList<String>();
+	
+	public static ArrayList<Conversation> conversations = new ArrayList<Conversation>();
+	public static ArrayList<User> users = new ArrayList<User>();
+	
+	
 	//MessageQueue that caches incoming messages
 	public static Queue<Message> messageQueue = new LinkedList<Message>();
 	
@@ -37,6 +38,10 @@ public class Server{
 
 		LOG.setLevel(Level.INFO);	
 		ServerSocket s = new ServerSocket(PORT);
+		
+		/** Creating default conversation channel*/
+		conversations.add(new Conversation("defaut"));
+		
 		LOG.info("Info: Server Socket is up an running, start serving clients");
 		System.out.println("JChatApp Server v0.1");
 		System.out.println("--------------------");

@@ -12,7 +12,7 @@ public class Conversation {
 	public Conversation(String s){
 		conversationName = s;
 		conversationID = this.hashCode();
-		users= new ArrayList<User>();
+		users = new ArrayList<User>();
 		messages= new ArrayList<Message>();
 	}
 	

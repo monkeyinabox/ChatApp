@@ -24,7 +24,7 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = 1223417195930483671L;
 
 	private int messageType;
-	private String conversationID;
+	private String conversationName;
 	private String senderID;
 	private String content;
 	private int messageID;
@@ -35,7 +35,7 @@ public class Message implements Serializable {
 		messageType = i;
 		content = c;
 		timestamp = Instant.now().getEpochSecond();
-		conversationID = cid;
+		conversationName = cid;
 		senderID = sid;
 		messageID = this.hashCode();
 	}
@@ -48,8 +48,8 @@ public class Message implements Serializable {
 		return content;
 	}
 	
-	public String getConversationID() {
-		return conversationID;
+	public String getConversationName() {
+		return conversationName;
 	}
 	
 	public String getSenderID() {

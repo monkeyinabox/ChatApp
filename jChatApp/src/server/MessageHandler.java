@@ -69,12 +69,18 @@ public class MessageHandler implements Runnable {
 	
 	private void userRemove(Message message) {
 			// TODO Auto-generated method stub
-			
+		Server.userlist.remove(message.getContent());
 		}
 	
 	private void userAdd(Message message) {
 			// TODO Auto-generated method stub
+			Server.userlist.add(message.getContent());
 			
+			Iterator<String> it = Server.userlist.iterator();
+				
+		    while (it.hasNext()) {
+		    	sendMessage(new Message(2,(String)it.next(),"system","server"));
+			}
 		}
 
 /**
