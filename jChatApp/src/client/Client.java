@@ -14,7 +14,7 @@ public final class Client {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		// Get the servers IP Address
-		InetAddress addr = InetAddress.getByName("localhost");
+		InetAddress addr = InetAddress.getByName("DESKTOP-V9A10CU");
 		System.out.println("addr = " + addr);
 
 		// Get the servers port number
@@ -37,8 +37,8 @@ public final class Client {
 			while (true) {
 				// What to say to server?
 				
-				output.writeObject(new Message(2,"Hans", "system", "hans"));
-				output.writeObject(new Message(3,"Hans", "system", "hans"));
+				output.writeObject(new Message(2,"Hans", "default", "hans"));
+				//output.writeObject(new Message(3,"Hans", "default", "hans"));
 				
 				System.out.print("What to say to server: ");
 				String what = KeyboardIn.readLine();
@@ -46,7 +46,7 @@ public final class Client {
 				output.flush();
 
             	Message ms = (Message) input.readObject();
-            	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationID()+ ", Content: " + ms.getContent());
+            	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationName()+ ", Content: " + ms.getContent());
 			}
 
 		}
