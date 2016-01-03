@@ -2,6 +2,8 @@ package server;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * 
@@ -28,15 +30,15 @@ public class Message implements Serializable {
 	private String senderID;
 	private String content;
 	private int messageID;
-	private long timestamp;
+	private Date timestamp;
 	
 	// Constructor
-	public Message(int i, String c, String cid, String sid){
-		messageType = i;
-		content = c;
-		timestamp = Instant.now().getEpochSecond();
-		conversationID = cid;
-		senderID = sid;
+	public Message(int messageType, String cont, String convid, String sendId){
+		this.messageType = messageType;
+		content = cont;
+		timestamp = new Date();
+		conversationID = convid;
+		senderID = sendId;
 		messageID = this.hashCode();
 	}
 	
@@ -56,11 +58,14 @@ public class Message implements Serializable {
 		return senderID;
 	}
 	
-	public long getTimestampD() {
+	public Date getTimestampD() {
 		return timestamp;
 	}
 	
 	public int getMessageID() {
 		return messageID;
+	}
+	public String getChatMessage(){
+		return timestamp.toLocaleString() + " " + senderID + ": "+content;
 	}
 }

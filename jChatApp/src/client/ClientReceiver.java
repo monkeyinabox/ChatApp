@@ -8,30 +8,26 @@ import java.net.Socket;
 import server.*;
 
 public class ClientReceiver extends Thread {
-	private ServerSocket serverSocket = null;
+	private Socket socket = null;
 	Client client;
 
-	public ClientReceiver(Client client) {
+	public ClientReceiver(Socket socket, Client client) {
+		this.socket = socket;
+		this.client = client;
 		start();
 	}
 
 	@Override
 	public void run() {
 		try {
-			this.serverSocket = new ServerSocket(Client.PORT);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		while (true) {
-			try {
-				Socket clientSo = serverSocket.accept();
-				InputStream in = clientSo.getInputStream();
-				ObjectInputStream oIn = new ObjectInputStream(in);
+			InputStream in = socket.getInputStream();
+			ObjectInputStream oIn = new ObjectInputStream(in);
+			while (true) {
 				Message message = (Message) oIn.readObject();
 				client.addMessage(message);
-			} catch (IOException | ClassNotFoundException e) {
-				System.out.println(e);
 			}
+		} catch (IOException | ClassNotFoundException e) {
+			System.out.println(e);
 		}
 	}
 
