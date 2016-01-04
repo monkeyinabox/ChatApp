@@ -9,11 +9,8 @@ import java.util.logging.Logger;
 /**
  * 
  * @author rifl
- * Server Class is starting threads for each connected client while listening on port 1337
- * 	- ClientHandler is dealing with client connections and will send, redirect and receive incoming messages 
- * 
- * HashMap conversations is storing all open client conversation
- * ArrayList users is storing User information as well as clients OutputStream
+ * This Class is starting threads for each connected client
+ * 		- ClientHandler is dealing with client connections and will send, redirect and receive incoming messages 
  */
 
 public class Server{
@@ -28,7 +25,7 @@ public class Server{
 	
 	public static void jChatAppServer() throws IOException{
 
-		LOG.setLevel(Level.INFO);
+		LOG.setLevel(Level.INFO);	
 		ServerSocket s = new ServerSocket(PORT);
 		
 		/** Creating default conversation channel*/

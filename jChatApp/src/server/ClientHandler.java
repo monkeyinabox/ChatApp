@@ -8,23 +8,16 @@ public class ClientHandler implements Runnable {
 
 	private Socket socket;
 	private int chID = this.hashCode();
-	private User user = new User("tmp"); // At this point the user name is unknown an we set a temporary one
+	private User user = new User("tmp");
 	
 	public ClientHandler(Socket s) throws IOException {
 		socket = s;
 	}
 	
-	
-	/**
-	 * Threaded ClientHandler, used handle communication with client. 
-	 * Client information are are stored in User Objects 
-	 * New Users will joins "default" channel at connection 
-	 */
 	@Override
 	public void run(){
 		Server.LOG.info("ClientHandler <"+ chID +">: thread started succsefully: " + socket.toString());
 		try{
-			// Create InputStream Reader "in"
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			Server.LOG.info("ClientHandler <"+ chID  +">: InputStream created: "+ in.toString());
 			
@@ -38,6 +31,7 @@ public class ClientHandler implements Runnable {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
 	        	Server.LOG.info("ClientHandler <"+ chID  +">: Action: Reciving Message, MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
+	        	//Server.messageQueue.add(message);
 				  
 	        	//Updating User name
 	           	if (user.getUsername() != message.getSenderName()) {
@@ -45,11 +39,6 @@ public class ClientHandler implements Runnable {
 					Server.LOG.info("ClientHandler <"+ chID  +">: Action: Username Updated: " +message.getSenderName());
 				}
 	        	
-	           	/**
-	           	 * Switch Statement to handle different MessageTypes
-	           	 * 
-	           	 * --> TBD: Create new Conversation and remove Conversation
-	           	 */
 	    		switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in a conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
@@ -115,10 +104,9 @@ public class ClientHandler implements Runnable {
 		
 		Server.conversations.get(message.getConversationName()).sendMessage(new Message(3,message.getContent(),message.getConversationName(),"server"));
 		
-		// only users own ClientHandler can remove from conversation
+		// only users Client Handler can remove from conversation
 		if (message.getSenderName() == user.getUsername()) {
 			Server.conversations.get(message.getConversationName()).userLeave(user);
-			Server.LOG.info("ClientHandler:<"+ chID  +"> User "+user.getUsername()+" leaft Conversation" + message.getConversationName());
 		}
 	}
 
@@ -133,13 +121,17 @@ public class ClientHandler implements Runnable {
 	
 		// Update all Client with new User name
 		if (Server.users.contains(message.getContent())){
+			
 			Server.conversations.get(message.getConversationName()).sendMessage(new Message(2,message.getContent(),message.getConversationName(),"server"));
+			
 			Server.LOG.info("Sending Broadcast Update:" + message.getContent()+" Conversation: "+message.getConversationName());
+		
 		}
 			
 		if (Server.conversations.containsKey(message.getConversationName())){
 			
 			Server.LOG.info("Updating Userlist: Username:" + message.getContent()+" Conversation: "+message.getConversationName());
+			
 			Iterator<User> it = Server.conversations.get(message.getConversationName()).getUsers().iterator();
 			
 		    while (it.hasNext()) {

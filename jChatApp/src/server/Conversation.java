@@ -6,11 +6,13 @@ import java.util.Iterator;
 public class Conversation {
 
 	private String conversationName;
+	private int conversationID;
 	private ArrayList<User> users;
 	private ArrayList<Message> messages;
 	
 	public Conversation(String s){
 		conversationName = s;
+		conversationID = this.hashCode();
 		users = new ArrayList<User>();
 		messages= new ArrayList<Message>();
 	}
