@@ -10,7 +10,6 @@ public class StartUp {
 		Server newServer = new Server();
 		newServer.jChatAppServer();
 		
-
 	}
 
 }

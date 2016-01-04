@@ -52,6 +52,10 @@ public class ClientHandler implements Runnable {
 				case 3: userRemove(message);
 						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
+				//Message Type 4 User changed username
+				case 4: changeUsername(message);
+						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect(message);
 						Server.LOG.info("ClientHandler<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
@@ -77,6 +81,11 @@ public class ClientHandler implements Runnable {
 		}
 	}
 	
+	private void changeUsername(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * 
 	 * @param message
