@@ -60,19 +60,21 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 	void doNewMessage(ActionEvent event) throws IOException, ClassNotFoundException {
 		sendMessage();
 	}
-
+	
 	@FXML
 	void pressedEnter(KeyEvent event) throws IOException, ClassNotFoundException {
 		if (event.getCode() == KeyCode.ENTER) {
 			sendMessage();
-		}
-	}
-
+		}	
+	 }
+	 
+	
 	private void sendMessage() {
 		client.sendText(sendArea.getText());
 		//chatArea.appendText(sendArea.getText() + "\n");
 		sendArea.clear();
 	}
+	
 
 	@FXML
 	void doConnect(ActionEvent event) throws IOException {
