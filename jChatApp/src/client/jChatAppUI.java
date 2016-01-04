@@ -35,7 +35,6 @@ public class jChatAppUI extends Application {
 			primaryStage.setTitle("JavaFX Chat Client");
 			primaryStage.setScene(scene);
 			primaryStage.show();
-			primaryStage.setOnCloseRequest(e->Platform.exit());//not working..?
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

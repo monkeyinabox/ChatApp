@@ -23,11 +23,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import server.Message;
-import server.MessageType;
-import javafx.event.*;
 
 public class jChatAppUIController extends AnchorPane implements Observer {
 	static final int PORT = 1337;
@@ -62,35 +59,19 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 	@FXML
 	void doNewMessage(ActionEvent event) throws IOException, ClassNotFoundException {
 		sendMessage();
-		sendArea.requestFocus();
 	}
 	
 	@FXML
-	void pressedEnter(KeyEvent event) throws IOException, ClassNotFoundException {		
-		if (event.getCode() == KeyCode.ENTER&&!event.isShiftDown()) {
+	void pressedEnter(KeyEvent event) throws IOException, ClassNotFoundException {
+		if (event.getCode() == KeyCode.ENTER) {
 			sendMessage();
-			event.consume();
-		}
-		if(event.getCode()==KeyCode.ENTER&&event.isShiftDown()){
-			sendArea.appendText("\n");			
-		}
-	}
-	
+		}	
+	 }
+	 
 	
 	private void sendMessage() {
-		int systemMessage = 1;
-		try{
-			//System.out.println("string: "+sendArea.getText().substring(0, 10));//nur zu testzwecken
-			if(sendArea.getText().subSequence(0, 10).equals("/username ")){
-				Client.user.setUsername(sendArea.getText().substring(10));
-				systemMessage = 1;
-			}
-		}
-		catch (IndexOutOfBoundsException e) {
-			System.out.println(e);
-		}		
-				
-		client.sendText(sendArea.getText(),systemMessage);
+		client.sendText(sendArea.getText());
+		//chatArea.appendText(sendArea.getText() + "\n");
 		sendArea.clear();
 	}
 	
