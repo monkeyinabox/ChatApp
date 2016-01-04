@@ -37,16 +37,22 @@ public final class Client {
 			while (true) {
 				// What to say to server?
 				
+				// output.writeObject(new Message(1,"Hello World", "default", "hans"));
+				
 				output.writeObject(new Message(2,"Hans", "default", "hans"));
 				//output.writeObject(new Message(3,"Hans", "default", "hans"));
 				
+				//output.writeObject(new Message(9,"Hans", "default", "hans"));
+				//output.writeObject(new Message(3,"Hans", "default", "hans"));
+				
+			
 				System.out.print("What to say to server: ");
+
 				String what = KeyboardIn.readLine();
 				output.writeObject(new Message(1, what, "default", "hans"));
-				output.flush();
-
+				output.flush(); 
             	Message ms = (Message) input.readObject();
-            	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderID() + ", Conversation: " +ms.getConversationName()+ ", Content: " + ms.getContent());
+            	System.out.println("Message <"+ms.getMessageType()+"> recived from: "+ ms.getSenderName() + ", Conversation: " +ms.getConversationName()+ ", Content: " + ms.getContent());
 			}
 
 		}

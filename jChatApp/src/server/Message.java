@@ -52,7 +52,7 @@ public class Message implements Serializable {
 		return conversationName;
 	}
 	
-	public String getSenderID() {
+	public String getSenderName() {
 		return senderID;
 	}
 	
@@ -63,4 +63,6 @@ public class Message implements Serializable {
 	public int getMessageID() {
 		return messageID;
 	}
+	
+	
 }

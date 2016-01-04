@@ -56,9 +56,14 @@ public class User {
 		        }	
 	}
 	
+	public boolean equals(String str) {
+		if (username == str) return true;
+		return false;
+	}
+
 	@Override
 	public String toString() {
-		return "User [username=" + username + "]";
+		return (username);
 	}
 
 }

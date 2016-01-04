@@ -1,7 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -10,28 +9,18 @@ import java.util.logging.Logger;
 /**
  * 
  * @author rifl
- * This Class is starting two thread
- * 		- ClientHandler is dealing with client connections and will receive incoming messages and save them in messageQueue
- * 		- MessageHandler will process messages in messageQueue and will parse and forward messages
+ * This Class is starting threads for each connected client
+ * 		- ClientHandler is dealing with client connections and will send, redirect and receive incoming messages 
  */
 
 public class Server{
 
-	//Collection of all connected clientsOutputStreams
-	public static ArrayList<ObjectOutputStream> clientOutputStreams = new ArrayList<ObjectOutputStream>();
-	
-	public static ArrayList<String> userlist = new ArrayList<String>();
-	
-	public static ArrayList<Conversation> conversations = new ArrayList<Conversation>();
+	public static HashMap<String, Conversation> conversations = new HashMap<String, Conversation>();
 	public static ArrayList<User> users = new ArrayList<User>();
-	
-	
-	//MessageQueue that caches incoming messages
-	public static Queue<Message> messageQueue = new LinkedList<Message>();
 	
 	// Network Port 	
 	static final int PORT=1337;
-	// Logger initialization
+	// Logger initialisation
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	public static void jChatAppServer() throws IOException{
@@ -40,40 +29,30 @@ public class Server{
 		ServerSocket s = new ServerSocket(PORT);
 		
 		/** Creating default conversation channel*/
-		conversations.add(new Conversation("defaut"));
+		conversations.put("default", new Conversation("defaut"));
 		
 		LOG.info("Info: Server Socket is up an running, start serving clients");
 		System.out.println("JChatApp Server v0.1");
 		System.out.println("--------------------");
 		ipAddress();
-	
-	 /**
-		LOG.info("Info: Starting MessagaeHandler thread");
-		try{
-			Thread mh = new Thread(new MessageHandler());
-			mh.start();
-		}
-		catch (Exception ex){LOG.info("Error : starting MessageHandler failed with exeption: "+ ex);}
-		
-		// Statistics
-	*/
 		
 		try{
 			while (true){
 			Socket socket = s.accept();
-			LOG.info("Info: Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
+			LOG.info("Server: Info:  Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
 			Thread t = new Thread(new ClientHandler(socket));
 			t.start();
 			}
 		}
 		catch (IOException e){
-			LOG.warning("Error: Got an IO Exception while starting ClientThread.. closing socket..(or not)");
+			LOG.warning("Server: Error: Got an IO Exception while starting ClientThread.. closing socket..(or not)");
 			s.close();
 		}
 	
 		finally {
 			s.close();
 			LOG.info("Server is Stopping...");
+			System.out.println("Server is Shuting down, thanks for the fish and so long suckers");
 		}
 	
 	}
