@@ -26,6 +26,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import server.Message;
+import server.MessageType;
 import javafx.event.*;
 
 public class jChatAppUIController extends AnchorPane implements Observer {
@@ -64,8 +65,6 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 		sendArea.requestFocus();
 	}
 	
-
-	
 	@FXML
 	void pressedEnter(KeyEvent event) throws IOException, ClassNotFoundException {		
 		if (event.getCode() == KeyCode.ENTER&&!event.isShiftDown()) {
@@ -78,9 +77,20 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 	}
 	
 	
-	
 	private void sendMessage() {
-		client.sendText(sendArea.getText());
+		int systemMessage = 1;
+		try{
+			//System.out.println("string: "+sendArea.getText().substring(0, 10));//nur zu testzwecken
+			if(sendArea.getText().subSequence(0, 10).equals("/username ")){
+				Client.user.setUsername(sendArea.getText().substring(10));
+				systemMessage = 1;
+			}
+		}
+		catch (IndexOutOfBoundsException e) {
+			System.out.println(e);
+		}		
+				
+		client.sendText(sendArea.getText(),systemMessage);
 		sendArea.clear();
 	}
 	
