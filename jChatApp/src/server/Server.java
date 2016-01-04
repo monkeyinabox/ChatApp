@@ -19,7 +19,7 @@ public class Server{
 	public static ArrayList<User> users = new ArrayList<User>();
 	
 	// Network Port 	
-	static final int PORT=1337;
+	public static final int PORT=1337;
 	// Logger initialisation
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	

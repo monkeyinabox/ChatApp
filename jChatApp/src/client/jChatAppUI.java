@@ -1,19 +1,38 @@
 package client;
 	
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+import server.Message;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.fxml.FXMLLoader;
 
 
 public class jChatAppUI extends Application {
+	
+	
+	public  static ObjectOutputStream output;
+	public static Socket socket;
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			AnchorPane root = (AnchorPane)FXMLLoader.load(getClass().getResource("jChatAppUI.fxml"));
-			Scene scene = new Scene(root,400,400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			Client client = new Client();
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("jChatAppUI.fxml"));
+			Parent root = (Parent) loader.load();
+			loader.<jChatAppUIController>getController().init(client);
+			Scene scene = new Scene(root);
+			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setTitle("JavaFX Chat Client");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
@@ -21,7 +40,9 @@ public class jChatAppUI extends Application {
 		}
 	}
 	
-	public static void main(String[] args) {
+
+	public static void main(String[] args) throws IOException {				
 		launch(args);
 	}
+	
 }
