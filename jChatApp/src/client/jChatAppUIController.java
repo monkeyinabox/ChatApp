@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import server.Message;
+import server.Server;
 
 public class jChatAppUIController extends AnchorPane implements Observer {
 	static final int PORT = 1337;

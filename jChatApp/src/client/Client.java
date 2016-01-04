@@ -9,15 +9,14 @@ import server.*;
 public class Client extends Observable {
 	private ObjectOutputStream output = null;
 	ClientReceiver receiver = null;
+	
 	public Client() {
 		try {
 			InetAddress addr = InetAddress.getByName("localhost");
 			System.out.println("addr = " + addr);
 			Socket socket = new Socket(addr, Server.PORT); // Get the servers port number
-			// chatArea.appendText("Connected to: "+":1337\n");
 			output = new ObjectOutputStream(socket.getOutputStream());
-			receiver = new ClientReceiver(socket, this);
-			
+			receiver = new ClientReceiver(socket, this);	
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}
@@ -67,7 +66,6 @@ public class Client extends Observable {
 
 	public void sendText(String text) {
 		try {
-			// Get the servers IP Address
 			output.writeObject(new Message(1, text, "system", "hans"));
 			output.flush();
 		} catch (Exception ex) {
@@ -80,6 +78,5 @@ public class Client extends Observable {
 		// TODO implement Conversation which handles all Messages and update the GUI.
 		this.setChanged();
 		notifyObservers(message.getChatMessage());
-		
 	}
 }
