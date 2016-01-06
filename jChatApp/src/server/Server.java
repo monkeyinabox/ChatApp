@@ -3,8 +3,10 @@ package server;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * 
@@ -22,8 +24,23 @@ public class Server{
 	public static final int PORT=1337;
 	// Logger initialisation
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	
+		
 	public static void jChatAppServer() throws IOException{
+
+		/**
+		 * Here we are defining a file where the Logs are written 
+		 */
+	    try {  
+	    	// This block configure the logger with handler and formatter  
+	    	FileHandler fh = new FileHandler("jChatAppServer.log");  
+	        LOG.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+	    } catch (SecurityException e) {  
+	        e.printStackTrace();  
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }
 
 		LOG.setLevel(Level.INFO);	
 		ServerSocket s = new ServerSocket(PORT);
@@ -45,7 +62,7 @@ public class Server{
 			}
 		}
 		catch (IOException e){
-			LOG.warning("Server: Error: Got an IO Exception while starting ClientThread.. closing socket..(or not)");
+			LOG.warning("Server: Error: Got an IOException while starting ClientThread.. closing socket..(or not)");
 			s.close();
 		}
 	
