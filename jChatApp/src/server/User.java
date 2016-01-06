@@ -37,11 +37,11 @@ public class User {
 		return userID;
 	}
 
-	public boolean isUserIsAdmin() {
+	public boolean isUserAdmin() {
 		return userIsAdmin;
 	}
 
-	public boolean isUserIsMuted() {
+	public boolean isUserMuted() {
 		return userIsMuted;
 	}
 

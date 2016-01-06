@@ -14,7 +14,6 @@ public class Conversation {
 		conversationName = s;
 		conversationID = this.hashCode();
 		users = new ArrayList<User>();
-		messages= new ArrayList<Message>();
 	}
 	
 	public void addMessage(Message message){
@@ -31,10 +30,6 @@ public class Conversation {
 	
 	public ArrayList<User> getUsers(){
 		return users;
-	}
-	
-	public ArrayList<Message> getMessages(){
-		return messages;
 	}
 	
 	public String getConversationName(){
