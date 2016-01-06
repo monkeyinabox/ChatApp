@@ -31,7 +31,7 @@ public class ClientHandler implements Runnable {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
 	        	Server.LOG.info("ClientHandler <"+ chID  +">: Action: Reciving Message, MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
-	        	//Server.messageQueue.add(message);
+
 				  
 	        	//Updating User name
 	           	if (user.getUsername() != message.getSenderName()) {
@@ -80,9 +80,21 @@ public class ClientHandler implements Runnable {
 		catch (IOException e) {Server.LOG.warning("ClientHandler <"+ chID  +">: Error on closing socket: ");}
 		}
 	}
-	
+	/**
+	 * 
+	 * @param message
+	 * Sending an update to all users where content is new User name and senderName is old User name
+	 * 
+	 */
 	private void changeUsername(Message message) {
-		// TODO Auto-generated method stub
+		
+		String oldName = user.getUsername();
+		
+		user.setUsername(message.getSenderName());
+		Server.LOG.info("ClientHandler <"+ chID  +">: Action: Username Updated: " +message.getSenderName());
+		
+		//I don't know which conversations the user has joined, will send to all known clients on default channel
+		Server.conversations.get("default").sendMessage(new Message(4,message.getSenderName(),"default",oldName));
 		
 	}
 
@@ -153,9 +165,9 @@ public class ClientHandler implements Runnable {
 	/**
 	 * 
 	 * @param message
-	 * Broadcasting messages to all connected client
+	 * Deprecated: Broadcasting messages to all connected client
 	 * 
-	 */
+	 
 	public void sendMessage(Message message){
 		Iterator<User> it = Server.users.iterator();
 			while (it.hasNext()) {
@@ -167,4 +179,5 @@ public class ClientHandler implements Runnable {
 		    }
 		}
 	}
+	*/
 }
