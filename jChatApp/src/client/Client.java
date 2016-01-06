@@ -14,8 +14,17 @@ public class Client extends Observable {
 	
 	public Client() {
 		try {
-			InetAddress addr = InetAddress.getByName("localhost");
-			System.out.println("addr = " + addr);
+	        InetAddress addr;
+	        String hostname;
+	        addr = InetAddress.getLocalHost();
+	        hostname = addr.getHostName();       
+	    	System.out.println("IP Addr.: "+ addr);
+	    	System.out.println("Your current Hostname : " + hostname);
+	    	System.out.println("Port Nr.: "+ Server.PORT);
+			
+			
+			//InetAddress addr = InetAddress.getLocalHost();
+			//System.out.println("addr = " + addr);
 			Socket socket = new Socket(addr, Server.PORT); // Get the servers port number
 			output = new ObjectOutputStream(socket.getOutputStream());
 			receiver = new ClientReceiver(socket, this);	
