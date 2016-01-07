@@ -3,8 +3,11 @@ package server;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -28,14 +31,41 @@ public class Server{
 	public static void jChatAppServer() throws IOException{
 
 		/**
-		 * Here we are defining a file where the Logs are written 
+		 * Here we are defining a file where the Logs are written and setting a proper format
+		 * 
+		 * -->TBD: Maybe we should setup a record method as it is called twice
 		 */
 	    try {  
-	    	// This block configure the logger with handler and formatter  
-	    	FileHandler fh = new FileHandler("jChatAppServer.log");  
+	    	// This block configure the logger with handler and formatter 
+	    	
+	     	    	
+	    	FileHandler fh = new FileHandler("jChatAppServer.log");
+	    	LOG.setUseParentHandlers(false);
+	    	Handler conHdlr = new ConsoleHandler();
+	    	
+	        fh.setFormatter(new SimpleFormatter() {
+	            public String format(LogRecord record) {
+	           
+	                return  new Date(record.getMillis()) + (" - ")
+	                	+ record.getLevel() + ": "
+	                    + record.getSourceClassName() + ": "
+	                    + record.getSourceMethodName() + ": "
+	                    + record.getMessage() + "\n";
+	              }
+	            }); 
+	        
+	        conHdlr.setFormatter(new SimpleFormatter() {
+	            public String format(LogRecord record) {
+	                return  new Date(record.getMillis()) + (" - ")
+		                	+ record.getLevel() + ": ["
+		                    + record.getSourceClassName() + "."
+		                    + record.getSourceMethodName() + "]: "
+		                    + record.getMessage() + "\n";
+	            	}
+	            });
+	        
 	        LOG.addHandler(fh);
-	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);  
+	        LOG.addHandler(conHdlr);
 	    } catch (SecurityException e) {  
 	        e.printStackTrace();  
 	    } catch (IOException e) {  
@@ -53,16 +83,20 @@ public class Server{
 		System.out.println("--------------------");
 		ipAddress();
 		
+		
+		/** 
+		 * I am the main loop of this class!
+		 */
 		try{
 			while (true){
 			Socket socket = s.accept();
-			LOG.info("Server: Info:  Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
+			LOG.info("Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
 			Thread t = new Thread(new ClientHandler(socket));
 			t.start();
 			}
 		}
 		catch (IOException e){
-			LOG.warning("Server: Error: Got an IOException while starting ClientThread.. closing socket..(or not)");
+			LOG.warning("Got an IOException while starting ClientThread.. closing socket..(or not)");
 			s.close();
 		}
 	
@@ -88,7 +122,8 @@ public class Server{
     		System.out.println("Port Nr.: "+ PORT);
  
         } catch (UnknownHostException e) { 
-        	LOG.severe("Error: Could not determine servers IP address, shuting down... "+ e);
+        	LOG.severe("Could not determine servers IP address, shuting down... "+ e);
+        	return;
         }
     }
 }

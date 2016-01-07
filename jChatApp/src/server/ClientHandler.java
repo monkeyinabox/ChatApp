@@ -16,10 +16,10 @@ public class ClientHandler implements Runnable {
 	
 	@Override
 	public void run(){
-		Server.LOG.info("ClientHandler <"+ chID +">: thread started succsefully: " + socket.toString());
+		Server.LOG.info("<"+ chID +">: thread started succsefully: " + socket.toString());
 		try{
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-			Server.LOG.info("ClientHandler <"+ chID  +">: InputStream created: "+ in.toString());
+			Server.LOG.info("<"+ chID  +">: InputStream created: "+ in.toString());
 			
 			// Save OutputStream to User Object
 			user.setOutputStream(new ObjectOutputStream(socket.getOutputStream()));
@@ -30,38 +30,37 @@ public class ClientHandler implements Runnable {
 			while (true) {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
-	        	Server.LOG.info("ClientHandler <"+ chID  +">: Action: Reciving Message, MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
+	        	Server.LOG.info("<"+ chID  +">: Reciving Message with MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
 
-				  
-	        	//Updating User name
-	           	if (user.getUsername() != message.getSenderName()) {
-					user.setUsername(message.getSenderName());
-					Server.LOG.info("ClientHandler <"+ chID  +">: Action: Username Updated: " +message.getSenderName());
-				}
-	        	
-	    		switch (message.getMessageType()){
+	        	switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in a conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
-						Server.LOG.info("ClinetHandler<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
+						Server.LOG.info("<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
 						break;
 				// Message Type 2 User is joining (content is user name)
 				case 2: userAdd(message);
-						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("<"+ chID  +">: Action: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 3 User left (content is user name)
 				case 3: userRemove(message);
-						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("<"+ chID  +">: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				//Message Type 4 User changed username
 				case 4: changeUsername(message);
-						Server.LOG.info("ClientHandler<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect(message);
-						Server.LOG.info("ClientHandler<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
+						Server.LOG.info("<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
-				default: Server.LOG.severe("ClientHandler<"+ chID  +">: Error: Message with unknown Message Type recived");
-						break;
+				default: Server.LOG.severe("<"+ chID  +">: Error: Message with unknown Message Type recived");
+						break;	
+				}
+	        	
+	    		//Updating User name
+	           	if (user.getUsername() != message.getSenderName()) {
+					user.setUsername(message.getSenderName());
+					Server.LOG.info("<"+ chID  +">: Username Updated: " +message.getSenderName());
 				}
 			}
 		}
@@ -75,9 +74,9 @@ public class ClientHandler implements Runnable {
 			Server.conversations.get("default").userLeave(user);
 						
 			socket.close();
-			Server.LOG.info("ClientHandler<"+ chID  +">: Closing client socket, Thank you and please come again..");
+			Server.LOG.info("<"+ chID  +">: Closing client socket, Thank you and please come again..");
 		}
-		catch (IOException e) {Server.LOG.warning("ClientHandler <"+ chID  +">: Error on closing socket: ");}
+		catch (IOException e) {Server.LOG.warning("<"+ chID  +">: Error on closing socket: ");}
 		}
 	}
 	/**
@@ -91,7 +90,7 @@ public class ClientHandler implements Runnable {
 		String oldName = user.getUsername();
 		
 		user.setUsername(message.getSenderName());
-		Server.LOG.info("ClientHandler <"+ chID  +">: Action: Username Updated: " +message.getSenderName());
+		Server.LOG.info("<"+ chID  +">: Action: Username Updated: " +message.getSenderName());
 		
 		//I don't know which conversations the user has joined, will send to all known clients on default channel
 		Server.conversations.get("default").sendMessage(new Message(4,message.getSenderName(),"default",oldName));

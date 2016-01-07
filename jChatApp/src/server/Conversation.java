@@ -42,10 +42,10 @@ public class Conversation {
 		Iterator<User> it = users.iterator();
 			while (it.hasNext()) {
 		        try {
-					it.next().getOutputStream().writeObject(message);
+					it.next().sendMessage(message);
 		        } 
 		        catch (Exception ex) {
-		        	Server.LOG.warning("Conversation: Warning: Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
+		        	Server.LOG.warning("Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
 		    }
 		}
 	}

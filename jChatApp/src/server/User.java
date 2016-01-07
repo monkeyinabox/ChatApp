@@ -49,10 +49,10 @@ public class User {
 	        try {
 					outputStream.writeObject(message);
 		        	outputStream.flush();
-		        	Server.LOG.warning("User: Send message to " + username +"<"+userID+">" +" succssesfully");
+		        	Server.LOG.info("<"+userID+"> Send message: ("+message.getContent()+") to " + username);
 		        } 
 		        catch (Exception ex) {
-		        	Server.LOG.warning("MessageHandler: Error: Could not send message to " + username +"<"+userID+">" +" with exeption: "+ ex);
+		        	Server.LOG.warning("<"+userID+"> Could not send message to " + username +" with exeption: "+ ex);
 		        }	
 	}
 	
