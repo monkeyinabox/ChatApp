@@ -24,21 +24,12 @@ public class ClientHandler implements Runnable {
 			
 			// Save OutputStream in User Object
 			user.setOutputStream(new ObjectOutputStream(socket.getOutputStream()));
-			
-			
-			
+						
 			while (true) {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
 	        	Server.LOG.info("<"+ chID  +">: Reciving Message with MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
-	        	
-	        	/** if this is your first run, set user name and join default conversation
-	        	if (user.getUsername()== "player"){
-					user.setUsername(message.getSenderName());
-	        		// Add User to default conversation
-					Server.conversations.get("default").userJoin(user);
-	        	}*/
-	        	
+      	
 	        	switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
@@ -56,7 +47,6 @@ public class ClientHandler implements Runnable {
 				case 5: joinConversation(message);
 						break;
 				case 6: leaveConversation(message);
-					
 						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect();
@@ -98,9 +88,7 @@ public class ClientHandler implements Runnable {
 			Server.LOG.warning("<"+ chID  +">: Conversation created: " +message.getConversationName());
 			Server.conversations.put(message.getConversationName(), new Conversation(message.getConversationName()));
 		}
-		// Don't allow a user to join a conversation twice
-		if (!Server.conversations.get(message.getConversationName()).getUsers().contains(user.getUsername()))
-			Server.conversations.get(message.getConversationName()).userJoin(user);
+		Server.conversations.get(message.getConversationName()).userJoin(user);
 	}
 	
 	/**
