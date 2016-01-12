@@ -42,19 +42,15 @@ public class ClientHandler implements Runnable {
 	        	switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
-						//Server.LOG.info("<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
 						break;
 				// Message Type 2 User is joining (content is user name)
 				case 2: userAdd(message);
-						Server.LOG.info("<"+ chID  +">: Action: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 3 User left (content is user name)
 				case 3: userRemove(message);
-						Server.LOG.info("<"+ chID  +">: Action: Removing User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				//Message Type 4 User changed username
 				case 4: changeUsername(message);
-						Server.LOG.info("<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				//Message Type 4 User changed username
 				case 5: joinConversation(message);
@@ -64,7 +60,6 @@ public class ClientHandler implements Runnable {
 						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect();
-						Server.LOG.info("<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				default: Server.LOG.severe("<"+ chID  +">: Error: Message with unknown Message Type recived");
 						break;	
@@ -131,7 +126,7 @@ public class ClientHandler implements Runnable {
 	private void changeUsername(Message message) {
 		String oldName = user.getUsername();
 		user.setUsername(message.getSenderName());
-		Server.LOG.info("<"+ chID  +">: Action: Username Updated: " +message.getSenderName());
+		Server.LOG.info("<"+ chID  +">: Username Updated New: " +message.getSenderName()+" Old: "+ oldName);
 		Iterator<HashMap.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
 		while (it.hasNext()) {
 			String cn = it.next().getKey();
@@ -181,15 +176,15 @@ public class ClientHandler implements Runnable {
 	 * 
 	 */
 	private void userAdd(Message message) {
-		
+				// If a new user is joining the server update his username
 		if (user.getUsername() != message.getSenderName())
 			changeUsername(message);
 		
-		// Check if it is a valid conversation
+		// Check if it is a valid conversation the user tries to join
 		if (Server.conversations.containsKey(message.getConversationName())){
+			Server.LOG.info("<"+ chID  +">: Adding User, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 			joinConversation(message);
-			
-	
+				
 			Server.LOG.info("Updating Userlist: Username:" + message.getContent()+" Conversation: "+message.getConversationName());
 			// Update User list for client with unicast
 			Iterator<User> it = Server.conversations.get(message.getConversationName()).getUsers().iterator();

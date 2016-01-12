@@ -1,6 +1,7 @@
 package server;
 
 import java.io.ObjectOutputStream;
+import java.net.SocketException;
 
 public class User {
 
@@ -41,8 +42,10 @@ public class User {
 		        	outputStream.flush();
 		        	Server.LOG.info("<"+userID+">Sending... MessageType: ["+message.getMessageType()+"] Content: ("+message.getContent()+") to " + username);
 		        } 
-		        catch (Exception ex) {
-		        	Server.LOG.warning("<"+userID+"> Could not send message to " + username +" with exeption: "+ ex);
+	        
+	        	catch (SocketException se){ Server.LOG.info("<"+userID+"> User [" + username +"] is diconnected");}
+	        
+		        catch (Exception ex) { Server.LOG.warning("<"+userID+"> Could not send message to " + username +" with exeption: "+ ex);
 		        }	
 	}
 	

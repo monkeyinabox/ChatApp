@@ -15,17 +15,17 @@ public class Conversation {
 	
 	public void userJoin(User user){
 		if (!users.contains(user)){
-			Server.LOG.info("Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
+			Server.LOG.info("<"+ this.hashCode() +"> Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
 			sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
 			users.add(user);
 		}
-		else{Server.LOG.info(user.getUsername()+" is allready in conversation: "+ this.getConversationName());}
+		else{Server.LOG.info("<"+ this.hashCode() +"> " +user.getUsername()+" is allready in conversation: "+ this.getConversationName());}
 	}
 	
 	public void userLeave(User user){
-		Server.LOG.info("Updating Clinets to remove user '" +user.getUsername()+"' from Conversation"+ this.getConversationName());
-		sendMessage(new Message(3,user.getUsername(),this.getConversationName(),user.getUsername()));
+		Server.LOG.info("<"+ this.hashCode() +"> Updating Clinets to remove user '" +user.getUsername()+"' from Conversation"+ this.getConversationName());
 		users.remove(user);
+		sendMessage(new Message(3,user.getUsername(),this.getConversationName(),user.getUsername()));
 	}
 	
 	public ArrayList<User> getUsers(){
@@ -47,7 +47,7 @@ public class Conversation {
 					it.next().sendMessage(message);
 		        } 
 		        catch (Exception ex) {
-		        	Server.LOG.warning("Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
+		        	Server.LOG.warning("<"+ this.hashCode() +"> Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
 		    }
 		}
 	}
