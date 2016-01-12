@@ -7,15 +7,10 @@ public class Conversation {
 
 	private String conversationName;
 	private ArrayList<User> users;
-	private ArrayList<Message> messages;
 	
 	public Conversation(String s){
 		conversationName = s;
 		users = new ArrayList<User>();
-	}
-	
-	public void addMessage(Message message){
-		messages.add(message);
 	}
 	
 	public void userJoin(User user){
