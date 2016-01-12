@@ -7,9 +7,7 @@ public class User {
 	
 	private String username;
 	private int userID;
-	private ObjectOutputStream outputStream; 
-	private boolean userIsAdmin;
-	private boolean userIsMuted;		
+	private ObjectOutputStream outputStream; 	
 			
 	public User (String n){
 		username = n;
@@ -35,14 +33,6 @@ public class User {
 
 	public int getUserID() {
 		return userID;
-	}
-
-	public boolean isUserAdmin() {
-		return userIsAdmin;
-	}
-
-	public boolean isUserMuted() {
-		return userIsMuted;
 	}
 
 	public void sendMessage(Message message){

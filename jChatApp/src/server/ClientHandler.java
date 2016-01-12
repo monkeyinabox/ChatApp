@@ -50,6 +50,13 @@ public class ClientHandler implements Runnable {
 				case 4: changeUsername(message);
 						Server.LOG.info("<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
+				//Message Type 4 User changed username
+				case 5: joinConversation(message);
+						Server.LOG.info("<"+ chID  +">: joining: "+message.getMessageID()+ ", " +message.getConversationName() +", Username: " + message.getContent());
+						break;
+				case 6: leaveConversation(message);
+						Server.LOG.info("<"+ chID  +">: joining: "+message.getMessageID()+ ", " +message.getConversationName() +", Username: " + message.getContent());
+						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect();
 						Server.LOG.info("<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
@@ -81,6 +88,32 @@ public class ClientHandler implements Runnable {
 		catch (IOException e) {Server.LOG.warning("<"+ chID  +">: Error on closing socket: ");}
 		}
 	}
+	
+	/**
+	 * Add User to conversation and create new conversation if it does not exist
+	 * @param message
+	 */
+	private void joinConversation(Message message) {
+		if (!Server.conversations.containsKey(message.getConversationName())){
+			Server.LOG.warning("<"+ chID  +">: Conversation created: " +message.getConversationName());
+			Server.conversations.put(message.getConversationName(), new Conversation(message.getConversationName()));
+		}
+		Server.conversations.get(message.getConversationName()).userJoin(user);
+	}
+	
+	/**
+	 * Remove User from conversation and delete it if no users are joined
+	 * @param message
+	 */
+	private void leaveConversation(Message message) {
+		Server.conversations.get(message.getConversationName()).userLeave(user);
+	
+		if (Server.conversations.get(message.getConversationName()).getUsers().isEmpty()){
+			Server.LOG.warning("<"+ chID  +">: Conversation destroyed: " +message.getConversationName());
+			Server.conversations.remove(message.getConversationName());	
+		}
+	}
+
 	/**
 	 * 
 	 * @param message
