@@ -2,14 +2,14 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 public class ClientHandler implements Runnable {
 
 	private Socket socket;
 	private int chID = this.hashCode();
-	private User user = new User("tmp");
+	private User user = new User();
 	
 	public ClientHandler(Socket s) throws IOException {
 		socket = s;
@@ -25,18 +25,24 @@ public class ClientHandler implements Runnable {
 			// Save OutputStream in User Object
 			user.setOutputStream(new ObjectOutputStream(socket.getOutputStream()));
 			
-			// Add User to default conversation
-			Server.conversations.get("default").userJoin(user);
+			
 			
 			while (true) {
 	        	/** Read messages from Socket and save to messageQueue */
 				Message message = (Message) in.readObject();
 	        	Server.LOG.info("<"+ chID  +">: Reciving Message with MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
-
+	        	
+	        	/** if this is your first run, set user name and join default conversation
+	        	if (user.getUsername()== "player"){
+					user.setUsername(message.getSenderName());
+	        		// Add User to default conversation
+					Server.conversations.get("default").userJoin(user);
+	        	}*/
+	        	
 	        	switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
-						Server.LOG.info("<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
+						//Server.LOG.info("<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
 						break;
 				// Message Type 2 User is joining (content is user name)
 				case 2: userAdd(message);
@@ -52,10 +58,9 @@ public class ClientHandler implements Runnable {
 						break;
 				//Message Type 4 User changed username
 				case 5: joinConversation(message);
-						Server.LOG.info("<"+ chID  +">: joining: "+message.getMessageID()+ ", " +message.getConversationName() +", Username: " + message.getContent());
 						break;
 				case 6: leaveConversation(message);
-						Server.LOG.info("<"+ chID  +">: joining: "+message.getMessageID()+ ", " +message.getConversationName() +", Username: " + message.getContent());
+					
 						break;
 				// Message Type 9 Client Disconnect
 				case 9: disconnect();
@@ -67,16 +72,16 @@ public class ClientHandler implements Runnable {
 			}
 		}
 		/**
-		 * Catch Disconnect
+		 * Catch client disconnect
 		 */
 		catch (SocketException se) {
-			disconnect();
+			//disconnect();
 			Server.LOG.info("<"+ chID  +">:User Disconnected: " + user.getUsername());}
 		
 		// Catch unexpected exception and print Stacktrace
-		catch(Exception m){	Server.LOG.warning("<"+ chID  +">: Error processing Message from socket: " + this.socket + " with exectipn: " + m + "\n" );
-							m.printStackTrace();}
-	
+		catch(Exception m){	
+			Server.LOG.warning("<"+ chID  +">: Error processing Message from socket: " + this.socket + " with exectipn: " + m + "\n" );
+			m.printStackTrace();}
 	
 	finally {
 		
@@ -98,7 +103,9 @@ public class ClientHandler implements Runnable {
 			Server.LOG.warning("<"+ chID  +">: Conversation created: " +message.getConversationName());
 			Server.conversations.put(message.getConversationName(), new Conversation(message.getConversationName()));
 		}
-		Server.conversations.get(message.getConversationName()).userJoin(user);
+		// Don't allow a user to join a conversation twice
+		if (!Server.conversations.get(message.getConversationName()).getUsers().contains(user.getUsername()))
+			Server.conversations.get(message.getConversationName()).userJoin(user);
 	}
 	
 	/**
@@ -106,6 +113,7 @@ public class ClientHandler implements Runnable {
 	 * @param message
 	 */
 	private void leaveConversation(Message message) {
+		Server.LOG.info("<"+ chID  +">: Leaving conversation: " +message.getConversationName() +", Username: " + message.getContent());
 		Server.conversations.get(message.getConversationName()).userLeave(user);
 	
 		if (Server.conversations.get(message.getConversationName()).getUsers().isEmpty()){
@@ -121,16 +129,14 @@ public class ClientHandler implements Runnable {
 	 * 
 	 */
 	private void changeUsername(Message message) {
-		
 		String oldName = user.getUsername();
 		user.setUsername(message.getSenderName());
 		Server.LOG.info("<"+ chID  +">: Action: Username Updated: " +message.getSenderName());
-		
-		Iterator<Map.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
+		Iterator<HashMap.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
 		while (it.hasNext()) {
-			Conversation c = it.next().getValue();
-	       	if (c.getUsers().contains(user)){
-	       		c.sendMessage(new Message(4,message.getSenderName(),c.getConversationName(),oldName));
+			String cn = it.next().getKey();
+	       	if (Server.conversations.get(cn).getUsers().contains(user)){
+	       		Server.conversations.get(cn).sendMessage(new Message(4,message.getSenderName(),cn,oldName));
 	       	}
 		}
 	}
@@ -143,12 +149,13 @@ public class ClientHandler implements Runnable {
 	 */
 	private void disconnect() {
 		// Remove User from every conversation if socket fails
-		Iterator<Map.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
+		Iterator<HashMap.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
 		while (it.hasNext()) {
-			Server.LOG.info("Test: "+it.toString());
-			Conversation c = it.next().getValue();
-	       	if (c.getUsers().contains(user.getUsername())){
-	       		c.userLeave(user);
+			String cn = it.next().getKey();
+			Server.LOG.info("User "+user.getUsername()+" Leaving Conversation: "+cn);
+	       	if (Server.conversations.get(cn).getUsers().contains(user)){ 
+	       		Server.LOG.info("Send Update to all in: "+cn);
+	       		Server.conversations.get(cn).userLeave(user);
 	       	}
 		}
 	}
@@ -166,7 +173,6 @@ public class ClientHandler implements Runnable {
 			Server.conversations.get(message.getConversationName()).userLeave(user);
 		}
 	}
-
 	
 	/**
 	 *  
@@ -175,38 +181,21 @@ public class ClientHandler implements Runnable {
 	 * 
 	 */
 	private void userAdd(Message message) {
-	
-		// Check if it is a valid user and conversation
-		if (Server.users.contains(message.getContent()) && Server.conversations.containsKey(message.getConversationName())){
-			Server.conversations.get(message.getConversationName()).userJoin(user);
+		
+		if (user.getUsername() != message.getSenderName())
+			changeUsername(message);
+		
+		// Check if it is a valid conversation
+		if (Server.conversations.containsKey(message.getConversationName())){
+			joinConversation(message);
+			
 	
 			Server.LOG.info("Updating Userlist: Username:" + message.getContent()+" Conversation: "+message.getConversationName());
+			// Update User list for client with unicast
 			Iterator<User> it = Server.conversations.get(message.getConversationName()).getUsers().iterator();
-			
-			// Update Userlist for client with unicast
 			while (it.hasNext()) {
 		       	user.sendMessage(new Message(2,it.next().getUsername(),message.getConversationName(),"server"));
-			}
-		    	
+			}	
 		}
 	}
-	
-	/**
-	 * 
-	 * @param message
-	 * Deprecated: Broadcasting messages to all connected client
-	 * 
-	 
-	public void sendMessage(Message message){
-		Iterator<User> it = Server.users.iterator();
-			while (it.hasNext()) {
-		        try {
-					it.next().getOutputStream().writeObject(message);
-		        } 
-		        catch (Exception ex) {
-		        	Server.LOG.warning("ClientHandler: Warning: Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
-		    }
-		}
-	}
-	*/
 }

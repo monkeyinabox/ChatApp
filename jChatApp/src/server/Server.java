@@ -14,20 +14,19 @@ import java.util.logging.SimpleFormatter;
 /**
  * 
  * @author rifl
- * This Class is starting threads for each connected client
- * 		- ClientHandler is dealing with client connections and will send, redirect and receive incoming messages 
+ * This Class is starting threads for each connected client and hold all global accessable variables 
+ * 		- Starts ClientHandler thread dealing with client connections
  */
 
 public class Server{
 
 	public static HashMap<String, Conversation> conversations = new HashMap<String, Conversation>();
-	public static ArrayList<User> users = new ArrayList<User>();
-	
+	// public static ArrayList<User> users = new ArrayList<User>();
 	// Network Port 	
 	public static final int PORT=1337;
 	// Logger initialisation
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-		
+
 	public static void jChatAppServer() throws IOException{
 
 		/**
@@ -37,16 +36,13 @@ public class Server{
 		 */
 	    try {  
 	    	// This block configure the logger with handler and formatter 
-	    	
-	     	// Log Format -> Date - Loglevel: [ClassName.MethodName]: Message
-	    	
+	    	// Log Format -> Date - Loglevel: [ClassName.MethodName]: Message
 	    	FileHandler fh = new FileHandler("jChatAppServer.log");
 	    	LOG.setUseParentHandlers(false);
 	    	Handler conHdlr = new ConsoleHandler();
-	    	
+	    	// File HanderFormat
 	        fh.setFormatter(new SimpleFormatter() {
 	            public String format(LogRecord record) {
-	           
 	                return  new Date(record.getMillis()) + (" - ")
 		                	+ record.getLevel() + ": ["
 		                    + record.getSourceClassName() + "."
@@ -54,7 +50,7 @@ public class Server{
 		                    + record.getMessage() + "\n";
 	              }
 	            }); 
-	        
+	        // ConsoleHandler Format
 	        conHdlr.setFormatter(new SimpleFormatter() {
 	            public String format(LogRecord record) {
 	                return  new Date(record.getMillis()) + (" - ")
@@ -67,15 +63,14 @@ public class Server{
 	        
 	        LOG.addHandler(fh);
 	        LOG.addHandler(conHdlr);
+	        LOG.setLevel(Level.INFO);
 	    } catch (SecurityException e) {  
 	        e.printStackTrace();  
 	    } catch (IOException e) {  
 	        e.printStackTrace();  
 	    }
-
-		LOG.setLevel(Level.INFO);	
+			
 		ServerSocket s = new ServerSocket(PORT);
-		
 		/** Creating default conversation channel*/
 		conversations.put("default", new Conversation("defaut"));
 		

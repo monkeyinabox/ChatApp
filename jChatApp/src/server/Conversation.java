@@ -14,9 +14,12 @@ public class Conversation {
 	}
 	
 	public void userJoin(User user){
-		Server.LOG.info("Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
-		sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
-		users.add(user);
+		if (!users.contains(user)){
+			Server.LOG.info("Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
+			sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
+			users.add(user);
+		}
+		else{Server.LOG.info(user.getUsername()+" is allready in conversation: "+ this.getConversationName());}
 	}
 	
 	public void userLeave(User user){

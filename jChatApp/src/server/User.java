@@ -9,8 +9,8 @@ public class User {
 	private int userID;
 	private ObjectOutputStream outputStream; 	
 			
-	public User (String n){
-		username = n;
+	public User (){
+		username = "player"; // default name
 		userID = this.hashCode();
 		
 	}
@@ -39,7 +39,7 @@ public class User {
 	        try {
 					outputStream.writeObject(message);
 		        	outputStream.flush();
-		        	Server.LOG.info("<"+userID+"> Send message: ("+message.getContent()+") to " + username);
+		        	Server.LOG.info("<"+userID+">Sending... MessageType: ["+message.getMessageType()+"] Content: ("+message.getContent()+") to " + username);
 		        } 
 		        catch (Exception ex) {
 		        	Server.LOG.warning("<"+userID+"> Could not send message to " + username +" with exeption: "+ ex);

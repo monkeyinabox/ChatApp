@@ -12,8 +12,9 @@ import java.util.Date;
  * 1 - chatMessage
  * 2 - userAdd
  * 3 - userRemove
- * 4 - Create Conversation
- * 5 - Remove Conversation
+ * 4 - changeUsername
+ * 5 - join Conversation
+ * 6 - leave conversation
  * 9 - disconnect
  * ->> Add needed commands here and add method to MessageHandler
 	 */
@@ -66,7 +67,7 @@ public class Message implements Serializable {
 	}
 	
 	public String getChatMessage(){
-		return timestamp.toString() + " " + senderID + ": "+content;
+		return timestamp.toString() + " [" + senderID + "]: "+content;
 	}
 	
 }
