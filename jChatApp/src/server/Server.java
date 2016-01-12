@@ -3,31 +3,74 @@ package server;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * 
  * @author rifl
- * This Class is starting threads for each connected client
- * 		- ClientHandler is dealing with client connections and will send, redirect and receive incoming messages 
+ * This Class is starting threads for each connected client and hold all global accessable variables 
+ * 		- Starts ClientHandler thread dealing with client connections
  */
 
 public class Server{
 
 	public static HashMap<String, Conversation> conversations = new HashMap<String, Conversation>();
-	public static ArrayList<User> users = new ArrayList<User>();
-	
+	// public static ArrayList<User> users = new ArrayList<User>();
 	// Network Port 	
 	public static final int PORT=1337;
 	// Logger initialisation
 	final static Logger LOG = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	
+
 	public static void jChatAppServer() throws IOException{
 
-		LOG.setLevel(Level.INFO);	
+		/**
+		 * Here we are defining a file where the Logs are written and setting a proper format
+		 * 
+		 * -->TBD: Maybe we should setup a record method as it is called twice
+		 */
+	    try {  
+	    	// This block configure the logger with handler and formatter 
+	    	// Log Format -> Date - Loglevel: [ClassName.MethodName]: Message
+	    	FileHandler fh = new FileHandler("jChatAppServer.log");
+	    	LOG.setUseParentHandlers(false);
+	    	Handler conHdlr = new ConsoleHandler();
+	    	// File HanderFormat
+	        fh.setFormatter(new SimpleFormatter() {
+	            public String format(LogRecord record) {
+	                return  new Date(record.getMillis()) + (" - ")
+		                	+ record.getLevel() + ": ["
+		                    + record.getSourceClassName() + "."
+		                    + record.getSourceMethodName() + "]: "
+		                    + record.getMessage() + "\n";
+	              }
+	            }); 
+	        // ConsoleHandler Format
+	        conHdlr.setFormatter(new SimpleFormatter() {
+	            public String format(LogRecord record) {
+	                return  new Date(record.getMillis()) + (" - ")
+		                	+ record.getLevel() + ": ["
+		                    + record.getSourceClassName() + "."
+		                    + record.getSourceMethodName() + "]: "
+		                    + record.getMessage() + "\n";
+	            	}
+	            });
+	        
+	        LOG.addHandler(fh);
+	        LOG.addHandler(conHdlr);
+	        LOG.setLevel(Level.INFO);
+	    } catch (SecurityException e) {  
+	        e.printStackTrace();  
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }
+			
 		ServerSocket s = new ServerSocket(PORT);
-		
 		/** Creating default conversation channel*/
 		conversations.put("default", new Conversation("defaut"));
 		
@@ -36,16 +79,20 @@ public class Server{
 		System.out.println("--------------------");
 		ipAddress();
 		
+		
+		/** 
+		 * I am the main loop of this class!
+		 */
 		try{
 			while (true){
 			Socket socket = s.accept();
-			LOG.info("Server: Info:  Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
+			LOG.info("Client connected with Address: " + s.getInetAddress() + ", starting new communication thread");
 			Thread t = new Thread(new ClientHandler(socket));
 			t.start();
 			}
 		}
 		catch (IOException e){
-			LOG.warning("Server: Error: Got an IO Exception while starting ClientThread.. closing socket..(or not)");
+			LOG.warning("Got an IOException while starting ClientThread.. closing socket..(or not)");
 			s.close();
 		}
 	
@@ -71,7 +118,8 @@ public class Server{
     		System.out.println("Port Nr.: "+ PORT);
  
         } catch (UnknownHostException e) { 
-        	LOG.severe("Error: Could not determine servers IP address, shuting down... "+ e);
+        	LOG.severe("Could not determine servers IP address, shuting down... "+ e);
+        	return;
         }
     }
 }

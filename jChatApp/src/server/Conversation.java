@@ -6,35 +6,30 @@ import java.util.Iterator;
 public class Conversation {
 
 	private String conversationName;
-	private int conversationID;
 	private ArrayList<User> users;
-	private ArrayList<Message> messages;
 	
 	public Conversation(String s){
 		conversationName = s;
-		conversationID = this.hashCode();
 		users = new ArrayList<User>();
-		messages= new ArrayList<Message>();
-	}
-	
-	public void addMessage(Message message){
-		messages.add(message);
 	}
 	
 	public void userJoin(User user){
-		users.add(user);
+		if (!users.contains(user)){
+			Server.LOG.info("<"+ this.hashCode() +"> Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
+			sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
+			users.add(user);
+		}
+		else{Server.LOG.info("<"+ this.hashCode() +"> " +user.getUsername()+" is allready in conversation: "+ this.getConversationName());}
 	}
 	
 	public void userLeave(User user){
+		Server.LOG.info("<"+ this.hashCode() +"> Updating Clinets to remove user '" +user.getUsername()+"' from Conversation"+ this.getConversationName());
 		users.remove(user);
+		sendMessage(new Message(3,user.getUsername(),this.getConversationName(),user.getUsername()));
 	}
 	
 	public ArrayList<User> getUsers(){
 		return users;
-	}
-	
-	public ArrayList<Message> getMessages(){
-		return messages;
 	}
 	
 	public String getConversationName(){
@@ -49,10 +44,10 @@ public class Conversation {
 		Iterator<User> it = users.iterator();
 			while (it.hasNext()) {
 		        try {
-					it.next().getOutputStream().writeObject(message);
+					it.next().sendMessage(message);
 		        } 
 		        catch (Exception ex) {
-		        	Server.LOG.warning("Conversation: Warning: Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
+		        	Server.LOG.warning("<"+ this.hashCode() +"> Could not send message to " + it.next().getUsername() +" with exeption: "+ ex);
 		    }
 		}
 	}

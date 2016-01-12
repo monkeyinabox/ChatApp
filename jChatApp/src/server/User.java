@@ -1,18 +1,17 @@
 package server;
 
 import java.io.ObjectOutputStream;
+import java.net.SocketException;
 
 public class User {
 
 	
 	private String username;
 	private int userID;
-	private ObjectOutputStream outputStream; 
-	private boolean userIsAdmin;
-	private boolean userIsMuted;		
+	private ObjectOutputStream outputStream; 	
 			
-	public User (String n){
-		username = n;
+	public User (){
+		username = "player"; // default name
 		userID = this.hashCode();
 		
 	}
@@ -37,22 +36,16 @@ public class User {
 		return userID;
 	}
 
-	public boolean isUserIsAdmin() {
-		return userIsAdmin;
-	}
-
-	public boolean isUserIsMuted() {
-		return userIsMuted;
-	}
-
 	public void sendMessage(Message message){
 	        try {
 					outputStream.writeObject(message);
 		        	outputStream.flush();
-		        	Server.LOG.warning("User: Send message to " + username +"<"+userID+">" +" succssesfully");
+		        	Server.LOG.info("<"+userID+">Sending... MessageType: ["+message.getMessageType()+"] Content: ("+message.getContent()+") to " + username);
 		        } 
-		        catch (Exception ex) {
-		        	Server.LOG.warning("MessageHandler: Error: Could not send message to " + username +"<"+userID+">" +" with exeption: "+ ex);
+	        
+	        	catch (SocketException se){ Server.LOG.info("<"+userID+"> User [" + username +"] is diconnected");}
+	        
+		        catch (Exception ex) { Server.LOG.warning("<"+userID+"> Could not send message to " + username +" with exeption: "+ ex);
 		        }	
 	}
 	
