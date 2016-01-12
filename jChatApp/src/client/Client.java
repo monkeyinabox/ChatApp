@@ -28,7 +28,7 @@ public class Client extends Observable {
 			Socket socket = new Socket(addr, Server.PORT); // Get the servers port number
 			output = new ObjectOutputStream(socket.getOutputStream());
 			receiver = new ClientReceiver(socket, this);	
-			user = new server.User("new User");
+			//user = new server.User("new User");
 			System.out.println(user.getUsername());
 		} catch (Exception ex) {
 			System.out.println(ex);
