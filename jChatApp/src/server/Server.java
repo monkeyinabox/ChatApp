@@ -38,7 +38,8 @@ public class Server{
 	    try {  
 	    	// This block configure the logger with handler and formatter 
 	    	
-	     	    	
+	     	// Log Format -> Date - Loglevel: [ClassName.MethodName]: Message
+	    	
 	    	FileHandler fh = new FileHandler("jChatAppServer.log");
 	    	LOG.setUseParentHandlers(false);
 	    	Handler conHdlr = new ConsoleHandler();
@@ -47,10 +48,10 @@ public class Server{
 	            public String format(LogRecord record) {
 	           
 	                return  new Date(record.getMillis()) + (" - ")
-	                	+ record.getLevel() + ": "
-	                    + record.getSourceClassName() + ": "
-	                    + record.getSourceMethodName() + ": "
-	                    + record.getMessage() + "\n";
+		                	+ record.getLevel() + ": ["
+		                    + record.getSourceClassName() + "."
+		                    + record.getSourceMethodName() + "]: "
+		                    + record.getMessage() + "\n";
 	              }
 	            }); 
 	        

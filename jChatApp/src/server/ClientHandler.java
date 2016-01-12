@@ -3,6 +3,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ClientHandler implements Runnable {
 
@@ -21,7 +22,7 @@ public class ClientHandler implements Runnable {
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			Server.LOG.info("<"+ chID  +">: InputStream created: "+ in.toString());
 			
-			// Save OutputStream to User Object
+			// Save OutputStream in User Object
 			user.setOutputStream(new ObjectOutputStream(socket.getOutputStream()));
 			
 			// Add User to default conversation
@@ -33,7 +34,7 @@ public class ClientHandler implements Runnable {
 	        	Server.LOG.info("<"+ chID  +">: Reciving Message with MessageID: "+message.getMessageID()+", MessageType: "+message.getMessageType()+", recived from: "+ message.getSenderName() + ", Conversation: " +message.getConversationName()+ ", Content: " + message.getContent());
 
 	        	switch (message.getMessageType()){
-				// Message Type 1 is broadcasted to all clients in a conversation
+				// Message Type 1 is broadcasted to all clients in conversation
 				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
 						Server.LOG.info("<"+ chID  +">: Action: Sending, MessageID: "+message.getMessageID()+ ", Content: " + message.getContent());
 						break;
@@ -50,29 +51,30 @@ public class ClientHandler implements Runnable {
 						Server.LOG.info("<"+ chID  +">: Action: Changing Username, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				// Message Type 9 Client Disconnect
-				case 9: disconnect(message);
+				case 9: disconnect();
 						Server.LOG.info("<"+ chID  +">: Action: User Disconnect, MessageID: "+message.getMessageID()+ ", Username: " + message.getContent());
 						break;
 				default: Server.LOG.severe("<"+ chID  +">: Error: Message with unknown Message Type recived");
 						break;	
 				}
-	        	
-	    		//Updating User name
-	           	if (user.getUsername() != message.getSenderName()) {
-					user.setUsername(message.getSenderName());
-					Server.LOG.info("<"+ chID  +">: Username Updated: " +message.getSenderName());
-				}
 			}
 		}
-		catch(Exception m){	Server.LOG.warning("ClientHandler <"+ chID  +">: Error processing Message from socket: " + this.socket + " with exectipn: " + m + "\n" );
+		/**
+		 * Catch Disconnect
+		 */
+		catch (SocketException se) {
+			disconnect();
+			Server.LOG.info("<"+ chID  +">:User Disconnected: " + user.getUsername());}
+		
+		// Catch unexpected exception and print Stacktrace
+		catch(Exception m){	Server.LOG.warning("<"+ chID  +">: Error processing Message from socket: " + this.socket + " with exectipn: " + m + "\n" );
 							m.printStackTrace();}
+	
 	
 	finally {
 		
 		try {
-			Server.LOG.info("ClientHandler:<"+ chID  +">: User removed from default channel");
-			Server.conversations.get("default").userLeave(user);
-						
+			disconnect();
 			socket.close();
 			Server.LOG.info("<"+ chID  +">: Closing client socket, Thank you and please come again..");
 		}
@@ -88,13 +90,16 @@ public class ClientHandler implements Runnable {
 	private void changeUsername(Message message) {
 		
 		String oldName = user.getUsername();
-		
 		user.setUsername(message.getSenderName());
 		Server.LOG.info("<"+ chID  +">: Action: Username Updated: " +message.getSenderName());
 		
-		//I don't know which conversations the user has joined, will send to all known clients on default channel
-		Server.conversations.get("default").sendMessage(new Message(4,message.getSenderName(),"default",oldName));
-		
+		Iterator<Map.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
+		while (it.hasNext()) {
+			Conversation c = it.next().getValue();
+	       	if (c.getUsers().contains(user)){
+	       		c.sendMessage(new Message(4,message.getSenderName(),c.getConversationName(),oldName));
+	       	}
+		}
 	}
 
 	/**
@@ -103,12 +108,15 @@ public class ClientHandler implements Runnable {
 	 * Client lost connection remove and destroy
 	 * 
 	 */
-	private void disconnect(Message message) {
-		
-		// If the client did not send a remove message do it for him
-		if (message.getSenderName() == user.getUsername()) {
-			Server.users.remove(user);
-			userRemove(message);	
+	private void disconnect() {
+		// Remove User from every conversation if socket fails
+		Iterator<Map.Entry<String, Conversation>> it = Server.conversations.entrySet().iterator();
+		while (it.hasNext()) {
+			Server.LOG.info("Test: "+it.toString());
+			Conversation c = it.next().getValue();
+	       	if (c.getUsers().contains(user.getUsername())){
+	       		c.userLeave(user);
+	       	}
 		}
 	}
 
@@ -119,13 +127,9 @@ public class ClientHandler implements Runnable {
 	 * 
 	*/
 	private void userRemove(Message message) {
-		
-		//should I check here if message is valid?
-		
-		Server.conversations.get(message.getConversationName()).sendMessage(new Message(3,message.getContent(),message.getConversationName(),"server"));
-		
 		// only users Client Handler can remove from conversation
 		if (message.getSenderName() == user.getUsername()) {
+			Server.LOG.info("<"+ chID  +">: User "+ message.getSenderName() +" Removed from" +message.getConversationName());
 			Server.conversations.get(message.getConversationName()).userLeave(user);
 		}
 	}
@@ -134,27 +138,20 @@ public class ClientHandler implements Runnable {
 	/**
 	 *  
 	 * @param message
-	 * If users Joins, update him with all user names currently connected and send his user name to all client
+	 * If users Joins, update him with all user names currently connected and send his user name to all other client
 	 * 
 	 */
 	private void userAdd(Message message) {
 	
-		// Update all Client with new User name
-		if (Server.users.contains(message.getContent())){
-			
-			Server.conversations.get(message.getConversationName()).sendMessage(new Message(2,message.getContent(),message.getConversationName(),"server"));
-			
-			Server.LOG.info("Sending Broadcast Update:" + message.getContent()+" Conversation: "+message.getConversationName());
-		
-		}
-			
-		if (Server.conversations.containsKey(message.getConversationName())){
-			
+		// Check if it is a valid user and conversation
+		if (Server.users.contains(message.getContent()) && Server.conversations.containsKey(message.getConversationName())){
+			Server.conversations.get(message.getConversationName()).userJoin(user);
+	
 			Server.LOG.info("Updating Userlist: Username:" + message.getContent()+" Conversation: "+message.getConversationName());
-			
 			Iterator<User> it = Server.conversations.get(message.getConversationName()).getUsers().iterator();
 			
-		    while (it.hasNext()) {
+			// Update Userlist for client with unicast
+			while (it.hasNext()) {
 		       	user.sendMessage(new Message(2,it.next().getUsername(),message.getConversationName(),"server"));
 			}
 		    	

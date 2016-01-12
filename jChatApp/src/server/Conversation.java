@@ -19,10 +19,14 @@ public class Conversation {
 	}
 	
 	public void userJoin(User user){
+		Server.LOG.info("Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
+		sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
 		users.add(user);
 	}
 	
 	public void userLeave(User user){
+		Server.LOG.info("Updating Clinets to remove user '" +user.getUsername()+"' from Conversation"+ this.getConversationName());
+		sendMessage(new Message(3,user.getUsername(),this.getConversationName(),user.getUsername()));
 		users.remove(user);
 	}
 	
