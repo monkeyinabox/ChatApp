@@ -10,11 +10,14 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -29,7 +32,7 @@ import server.Message;
 import server.MessageType;
 import javafx.event.*;
 
-public class jChatAppUIController extends AnchorPane implements Observer {
+public class jChatAppUIController extends AnchorPane implements Observer{
 	static final int PORT = 1337;
 
 	public static Socket socket;
@@ -46,7 +49,7 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 	private Label userLabel; // Value injected by FXMLLoader
 
 	@FXML // fx:id="userList"
-	private ListView<?> userList; // Value injected by FXMLLoader
+	private ListView<String> userList = new ListView(ClientReceiver.items); // Value injected by FXMLLoader
 
 	@FXML // fx:id="sendArea"
 	private TextArea sendArea; // Value injected by FXMLLoader
@@ -56,6 +59,7 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 
 	@FXML // fx:id="buConnect"
 	private Button buConnect; // Value injected by FXMLLoader
+	
 
 	private Client client;
 
@@ -77,13 +81,19 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 	}
 	
 	
-	private void sendMessage() {
+	private void sendMessage() throws UnknownHostException {
 		int systemMessage = 1;
 		try{
 			//System.out.println("string: "+sendArea.getText().substring(0, 10));//nur zu testzwecken
 			if(sendArea.getText().subSequence(0, 10).equals("/username ")){
 				Client.user.setUsername(sendArea.getText().substring(10));
 				systemMessage = 1;
+			}
+			if(sendArea.getText().subSequence(0, 9).equals("/connect ")){
+				String newIP=sendArea.getText().substring(9);
+				//Client.addr=InetAddress.getByName(newIP);
+				systemMessage = 1;
+				//System.out.println("Connected to: "+Client.addr);
 			}
 		}
 		catch (IndexOutOfBoundsException e) {
@@ -97,8 +107,15 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 
 	@FXML
 	void doConnect(ActionEvent event) throws IOException {
-
+		//ListView userList = new ListView(items);
+		ClientReceiver.items.add("tom");
+		System.out.println(userList.getItems());
 	}
+	
+    @FXML
+    void listLoad(ActionEvent event) {
+
+    }
 
 	@FXML // This method is called by the FXMLLoader when initialization is
 			// complete
@@ -109,6 +126,7 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 		assert sendArea != null : "fx:id=\"sendArea\" was not injected: check your FXML file 'jChatAppUI.fxml'.";
 		assert buSend != null : "fx:id=\"buSend\" was not injected: check your FXML file 'jChatAppUI.fxml'.";
 		assert buConnect != null : "fx:id=\"buConnect\" was not injected: check your FXML file 'jChatAppUI.fxml'.";
+		userList.setItems(ClientReceiver.items);
 
 	}
 
@@ -123,6 +141,7 @@ public class jChatAppUIController extends AnchorPane implements Observer {
 			@Override
 			public void run() {
 				chatArea.appendText((String) clientArg + "\n");
+				userList.setItems(ClientReceiver.items);
 			}
 		});
 	}

@@ -18,6 +18,7 @@ public class Conversation {
 			Server.LOG.info("<"+ this.hashCode() +"> Updating Clinets to add user '" +user.getUsername()+"' to Conversation"+ this.getConversationName());
 			sendMessage(new Message(2,user.getUsername(),this.getConversationName(),user.getUsername()));
 			users.add(user);
+			user.sendMessage(new Message(1,"Welcome to "+conversationName,conversationName,"Server"));
 		}
 		else{Server.LOG.info("<"+ this.hashCode() +"> " +user.getUsername()+" is allready in conversation: "+ this.getConversationName());}
 	}

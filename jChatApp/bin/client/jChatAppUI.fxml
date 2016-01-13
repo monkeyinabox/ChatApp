@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -24,7 +25,10 @@
             <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="100.0">
                <children>
 						<Label fx:id="userLabel" text="Users:" />
-                  <ListView fx:id="userList" prefHeight="500.0" prefWidth="200.0" />
+                  <ListView fx:id="userList" editable="true" onEditStart="#listLoad" prefHeight="500.0" prefWidth="200.0">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></ListView>
                   <Button fx:id="buConnect" mnemonicParsing="false" onAction="#doConnect" text="Connect" />
                </children>
             </VBox>
