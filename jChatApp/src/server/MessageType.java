@@ -1,8 +1,11 @@
 package server;
 
 public enum MessageType {
-	NewMessage,
-	AddUser,
-	RemoveUser,
-	CreateConversation
+	NEWMESSAGE,
+	ADDUSER,
+	REMOVEUSER,
+	CHANGEUSERNAME,
+	JOINCONVERSATION,
+	LEAVECONVERSATION,
+	DISCONNECT
 }
