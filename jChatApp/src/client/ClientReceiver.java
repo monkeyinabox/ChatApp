@@ -31,13 +31,13 @@ public class ClientReceiver extends Thread {
 				Message message = (Message) oIn.readObject();
 				
 				switch (message.getMessageType()) {
-				case 1:
+				case NEWMESSAGE:
 					client.addMessage(message);
 					break;
-				case 2:
+				case ADDUSER:
 					items.add(message.getContent());
 					break;
-				case 3:
+				case REMOVEUSER:
 					items.remove(message.getContent());
 					break;
 

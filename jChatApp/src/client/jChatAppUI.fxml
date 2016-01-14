@@ -29,7 +29,7 @@
                      <VBox.margin>
                         <Insets />
                      </VBox.margin></ListView>
-                  <Button fx:id="buConnect" mnemonicParsing="false" onAction="#doConnect" text="Connect" />
+                  <Button fx:id="buDisconnect" mnemonicParsing="false" onAction="#doDisconnect" text="Disconnect" />
                </children>
             </VBox>
          </children>

@@ -1,52 +1,48 @@
 package client;
 	
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.stage.Stage;
-import server.Message;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.AnchorPane;
 import javafx.fxml.FXMLLoader;
 
 
 public class jChatAppUI extends Application {
-	
-	
+	public static Stage stage;
 	public  static ObjectOutputStream output;
 	public static Socket socket;
-	
+	public static Stage primaryStage;
+	public static Parent root;
 	@Override
 	public void start(Stage primaryStage) {
-		try {
-			Client client = new Client();
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("jChatAppUI.fxml"));
-			Parent root = (Parent) loader.load();
-			loader.<jChatAppUIController>getController().init(client);
+		//Scene scene = new Scene(root);
+		//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		//loader.<jChatAppUIController>getController().init(client);
+		this.primaryStage = primaryStage;
+		this.primaryStage.setTitle("jChappApp");
+		logInScene();
+	}
+	
+	public void logInScene(){
+		try{
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("jConnectUI.fxml"));
+			root = (Parent) loader.load();
 			Scene scene = new Scene(root);
-			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setTitle("JavaFX Chat Client");
 			primaryStage.setScene(scene);
 			primaryStage.show();
-			primaryStage.setOnCloseRequest(e->Platform.exit());//not working..?
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+			
+			//primaryStage.setOnCloseRequest(e->Platform.exit());//not working..?
+		}catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 
 	public static void main(String[] args) throws IOException {				
 		launch(args);
 	}
-	
 }

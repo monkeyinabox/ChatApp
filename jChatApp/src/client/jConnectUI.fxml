@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="150.0" minWidth="200.0" prefHeight="200.0" prefWidth="300.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.jConnectUIController">
+	<children>
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" spacing="10.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <TextField fx:id="fieldUsername" promptText="Username" />
+            <TextField fx:id="fieldIP" promptText="IPAddress" />
+            <Button fx:id="buConnect" mnemonicParsing="false" onAction="#doConnect" prefHeight="30.0" prefWidth="60.0" text="Connect" />
+         </children>
+      </VBox>
+	</children>
+</AnchorPane>

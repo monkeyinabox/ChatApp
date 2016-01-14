@@ -25,7 +25,7 @@ public class Message implements Serializable {
 	 */
 	private static final long serialVersionUID = 1223417195930483671L;
 
-	private int messageType;
+	private MessageType messageType;
 	private String conversationName;
 	private String senderID;
 	private String content;
@@ -33,16 +33,16 @@ public class Message implements Serializable {
 	private Date timestamp;
 	
 	// Constructor
-	public Message(int i, String c, String cid, String sid){
-		messageType = i;
-		content = c;
-		timestamp = new Date();
-		conversationName = cid;
-		senderID = sid;
-		messageID = this.hashCode();
+	public Message(MessageType messageType, String content, String conversationName, String senderID){
+		this.messageType = messageType;
+		this.content = content;
+		this.timestamp = new Date();
+		this.conversationName = conversationName;
+		this.senderID = senderID;
+		this.messageID = this.hashCode();
 	}
 	
-	public int getMessageType() {
+	public MessageType getMessageType() {
 		return messageType;
 	}
 	

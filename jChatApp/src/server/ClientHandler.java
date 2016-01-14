@@ -32,24 +32,24 @@ public class ClientHandler implements Runnable {
       	
 	        	switch (message.getMessageType()){
 				// Message Type 1 is broadcasted to all clients in conversation
-				case 1: Server.conversations.get(message.getConversationName()).sendMessage(message);
+				case NEWMESSAGE: Server.conversations.get(message.getConversationName()).sendMessage(message);
 						break;
 				// Message Type 2 User is joining (content is user name)
-				case 2: userAdd(message);
+				case ADDUSER: userAdd(message);
 						break;
 				// Message Type 3 User left (content is user name)
-				case 3: userRemove(message);
+				case REMOVEUSER: userRemove(message);
 						break;
 				//Message Type 4 User changed username
-				case 4: changeUsername(message);
+				case CHANGEUSERNAME: changeUsername(message);
 						break;
 				//Message Type 4 User changed username
-				case 5: joinConversation(message);
+				case JOINCONVERSATION: joinConversation(message);
 						break;
-				case 6: leaveConversation(message);
+				case LEAVECONVERSATION: leaveConversation(message);
 						break;
 				// Message Type 9 Client Disconnect
-				case 9: disconnect();
+				case DISCONNECT: disconnect();
 						break;
 				default: Server.LOG.severe("<"+ chID  +">: Error: Message with unknown Message Type recived");
 						break;	
@@ -119,7 +119,7 @@ public class ClientHandler implements Runnable {
 		while (it.hasNext()) {
 			String cn = it.next().getKey();
 	       	if (Server.conversations.get(cn).getUsers().contains(user)){
-	       		Server.conversations.get(cn).sendMessage(new Message(4,message.getSenderName(),cn,oldName));
+	       		Server.conversations.get(cn).sendMessage(new Message(MessageType.CHANGEUSERNAME,message.getSenderName(),cn,oldName));
 	       	}
 		}
 	}
@@ -177,7 +177,7 @@ public class ClientHandler implements Runnable {
 			// Update User list for client with unicast
 			Iterator<User> it = Server.conversations.get(message.getConversationName()).getUsers().iterator();
 			while (it.hasNext()) {
-		       	user.sendMessage(new Message(2,it.next().getUsername(),message.getConversationName(),"server"));
+		       	user.sendMessage(new Message(MessageType.ADDUSER,it.next().getUsername(),message.getConversationName(),"server"));
 			}	
 		}
 	}

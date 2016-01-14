@@ -11,7 +11,7 @@ public class User {
 	private ObjectOutputStream outputStream; 	
 			
 	public User (){
-		username = "player"; // default name
+		this.username = "new player"; // default name
 		userID = this.hashCode();
 		
 	}
